@@ -82,15 +82,15 @@ export default function Home() {
       </section>
 
       {/* Statistics Section */}
-      <section className="section-padding bg-card relative overflow-hidden">
+      <section className="section-padding relative overflow-hidden">
         {/* Background Image */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{
             backgroundImage: "url('https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&h=1080')"
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-primary/60" />
+        <div className="absolute inset-0 bg-black/70" />
         
         <div className="container-max relative z-10">
           <div className="text-center mb-16">
@@ -201,7 +201,7 @@ export default function Home() {
                   <CardContent className="p-6">
                     <h3 className="text-xl text-subheading mb-2">{product.name}</h3>
                     <p className="text-muted-foreground mb-4">{product.description}</p>
-                    <span className="text-primary font-semibold">{product.price}</span>
+                    <span className="text-primary font-semibold">₹{product.basePrice}</span>
                   </CardContent>
                 </Card>
               ))}
