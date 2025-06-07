@@ -38,13 +38,13 @@ export default function CustomerProducts() {
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary/10 to-primary/5 py-16">
-        <div className="container-max">
+      <section className="bg-gradient-to-r from-primary/10 to-primary/5 py-8 sm:py-12 lg:py-16">
+        <div className="container-max px-4">
           <div className="text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold text-heading mb-4">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-heading mb-3 sm:mb-4">
               Our Products from Everyday Brand
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
               Discover our wide range of freshly baked goods, from traditional breads to delicious cakes
             </p>
           </div>
@@ -52,13 +52,14 @@ export default function CustomerProducts() {
       </section>
 
       {/* Category Filter */}
-      <section className="py-8 bg-card border-b">
-        <div className="container-max">
-          <div className="flex flex-wrap gap-2 justify-center">
+      <section className="py-6 sm:py-8 bg-card border-b">
+        <div className="container-max px-4">
+          <div className="flex flex-wrap gap-2 sm:gap-3 justify-center">
             <Button
               variant={selectedCategory === "all" ? "default" : "outline"}
               onClick={() => setSelectedCategory("all")}
-              className="rounded-full"
+              className="rounded-full text-sm sm:text-base px-3 sm:px-4 py-2"
+              size="sm"
             >
               All Products
             </Button>
@@ -67,7 +68,8 @@ export default function CustomerProducts() {
                 key={category.id}
                 variant={selectedCategory === category.id ? "default" : "outline"}
                 onClick={() => setSelectedCategory(category.id)}
-                className="rounded-full"
+                className="rounded-full text-sm sm:text-base px-3 sm:px-4 py-2"
+                size="sm"
               >
                 {category.name}
               </Button>

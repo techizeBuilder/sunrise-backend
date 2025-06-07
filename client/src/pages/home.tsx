@@ -23,10 +23,10 @@ export default function Home() {
         />
         <div className="absolute inset-0 hero-overlay" />
         <div className="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-7xl text-heading mb-6">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-heading mb-4 sm:mb-6">
             Golden Crust Bakery
           </h1>
-          <p className="text-xl md:text-2xl mb-8 font-light">
+          <p className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 font-light px-4">
             Artisanal breads and pastries baked fresh daily with love and tradition
           </p>
           <Link href="/products">
@@ -100,67 +100,67 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 sm:gap-8">
             {/* Years of Experience */}
             <div className="text-center text-white">
-              <div className="text-4xl lg:text-5xl font-bold mb-2">21</div>
-              <p className="text-sm text-white/90">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">21</div>
+              <p className="text-xs sm:text-sm text-white/90 px-2">
                 Years of experience in manufacturing, institutional sales, and retail.
               </p>
             </div>
             
             {/* Employees */}
             <div className="text-center text-white">
-              <div className="text-4xl lg:text-5xl font-bold mb-2">650</div>
-              <p className="text-sm text-white/90">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">650</div>
+              <p className="text-xs sm:text-sm text-white/90 px-2">
                 Employees with strong management teams across three units
               </p>
             </div>
             
             {/* Manufacturing Units */}
             <div className="text-center text-white">
-              <div className="text-4xl lg:text-5xl font-bold mb-2">3</div>
-              <p className="text-sm text-white/90">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">3</div>
+              <p className="text-xs sm:text-sm text-white/90 px-2">
                 Manufacturing units spread across three states. (AP, TG & KA)
               </p>
             </div>
             
             {/* Manufacturing Space */}
             <div className="text-center text-white">
-              <div className="text-4xl lg:text-5xl font-bold mb-2">35000</div>
-              <p className="text-sm text-white/90">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">35000</div>
+              <p className="text-xs sm:text-sm text-white/90 px-2">
                 Sq. Ft. manufacturing space across Andhra Pradesh, Karnataka, and Telangana
               </p>
             </div>
             
             {/* SKUs */}
             <div className="text-center text-white">
-              <div className="text-4xl lg:text-5xl font-bold mb-2">82</div>
-              <p className="text-sm text-white/90">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">82</div>
+              <p className="text-xs sm:text-sm text-white/90 px-2">
                 SKUs with dedicated product team continually developing new tastes
               </p>
             </div>
             
             {/* Annual Growth */}
             <div className="text-center text-white">
-              <div className="text-4xl lg:text-5xl font-bold mb-2">15</div>
-              <p className="text-sm text-white/90">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">15</div>
+              <p className="text-xs sm:text-sm text-white/90 px-2">
                 Percent of annual growth on year-on-year basis to be a growing brand in local markets
               </p>
             </div>
             
             {/* Total Outlets */}
-            <div className="text-center text-white col-span-2 md:col-span-1">
-              <div className="text-4xl lg:text-5xl font-bold mb-2">40000</div>
-              <p className="text-sm text-white/90">
+            <div className="text-center text-white sm:col-span-2 md:col-span-1 lg:col-span-1">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">40000</div>
+              <p className="text-xs sm:text-sm text-white/90 px-2">
                 Total outlets where our products are accessible. BLR-5000 + 35,000-S. India
               </p>
             </div>
             
             {/* Distributors */}
-            <div className="text-center text-white col-span-2 md:col-span-2 lg:col-span-1">
-              <div className="text-4xl lg:text-5xl font-bold mb-2">1250</div>
-              <p className="text-sm text-white/90">
+            <div className="text-center text-white sm:col-span-2 md:col-span-2 lg:col-span-1">
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">1250</div>
+              <p className="text-xs sm:text-sm text-white/90 px-2">
                 Distributors spread across three manufacturing units of 3 operational states.
               </p>
             </div>
@@ -221,34 +221,34 @@ export default function Home() {
       {/* About Us Section */}
       <section id="about" className="section-padding bg-background">
         <div className="container-max">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-4xl text-heading mb-6">About Sunrise Foods</h2>
-              <p className="text-lg text-muted-foreground mb-6">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+            <div className="order-2 lg:order-1">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl text-heading mb-4 sm:mb-6">About Sunrise Foods</h2>
+              <p className="text-base sm:text-lg text-muted-foreground mb-4 sm:mb-6">
                 With over two decades of excellence in the bakery industry, Sunrise Foods has grown from a small bakery 
                 to one of India's most trusted names in baked goods. Our journey began in 2003 with a simple mission: 
                 to create delicious, high-quality products that bring families together.
               </p>
-              <p className="text-lg text-muted-foreground mb-6">
+              <p className="text-base sm:text-lg text-muted-foreground mb-4 sm:mb-6">
                 Today, we operate three state-of-the-art manufacturing facilities across Andhra Pradesh, Telangana, 
                 and Karnataka, employing over 650 dedicated professionals who share our passion for quality and innovation.
               </p>
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <div className="text-2xl font-bold text-primary mb-1">2003</div>
-                  <p className="text-sm text-muted-foreground">Founded</p>
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+                <div className="text-center p-3 sm:p-4 bg-muted/50 rounded-lg">
+                  <div className="text-xl sm:text-2xl font-bold text-primary mb-1">2003</div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Founded</p>
                 </div>
-                <div className="text-center p-4 bg-muted/50 rounded-lg">
-                  <div className="text-2xl font-bold text-primary mb-1">3</div>
-                  <p className="text-sm text-muted-foreground">States</p>
+                <div className="text-center p-3 sm:p-4 bg-muted/50 rounded-lg">
+                  <div className="text-xl sm:text-2xl font-bold text-primary mb-1">3</div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">States</p>
                 </div>
               </div>
             </div>
-            <div className="relative">
+            <div className="relative order-1 lg:order-2">
               <img 
                 src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600"
                 alt="About Sunrise Foods"
-                className="w-full h-96 object-cover rounded-lg shadow-lg"
+                className="w-full h-64 sm:h-80 lg:h-96 object-cover rounded-lg shadow-lg"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-lg" />
             </div>
