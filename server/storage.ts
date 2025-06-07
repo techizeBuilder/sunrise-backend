@@ -175,7 +175,7 @@ export class MongoStorage implements IStorage {
       { name: "Cookies", description: "Crispy and soft baked cookies", sortOrder: 4, isActive: true },
     ];
 
-    const categoryIds = {};
+    const categoryIds: Record<string, string> = {};
     for (const categoryData of sampleCategories) {
       const category = await this.createCategory(categoryData);
       categoryIds[categoryData.name.toLowerCase()] = category.id;
@@ -383,9 +383,296 @@ export class MongoStorage implements IStorage {
 
   async getLowStockProducts(): Promise<Product[]> {
     const products = await this.db.collection('products').find({
-      $expr: { $lte: ["$stock", "$minStock"] }
+      $expr: { $lte: ["$stock", "$minStock"] },
+      isActive: true
     }).toArray();
-    return products.map(product => this.transformMongoDoc(product));
+    return products.map((product: any) => this.transformMongoDoc(product));
+  }
+
+  async getProductsByCategory(categoryId: string): Promise<Product[]> {
+    const products = await this.db.collection('products').find({ 
+      categoryId, 
+      isActive: true 
+    }).toArray();
+    return products.map((product: any) => this.transformMongoDoc(product));
+  }
+
+  async searchProducts(query: string): Promise<Product[]> {
+    const products = await this.db.collection('products').find({
+      $and: [
+        { isActive: true },
+        {
+          $or: [
+            { name: { $regex: query, $options: 'i' } },
+            { description: { $regex: query, $options: 'i' } },
+            { sku: { $regex: query, $options: 'i' } },
+            { tags: { $in: [new RegExp(query, 'i')] } }
+          ]
+        }
+      ]
+    }).toArray();
+    return products.map((product: any) => this.transformMongoDoc(product));
+  }
+
+  // Category operations
+  async getCategories(): Promise<ProductCategory[]> {
+    const categories = await this.db.collection('categories').find({ isActive: true }).sort({ sortOrder: 1 }).toArray();
+    return categories.map((category: any) => this.transformMongoDoc(category));
+  }
+
+  async getCategory(id: string): Promise<ProductCategory | undefined> {
+    const category = await this.db.collection('categories').findOne({ id });
+    return category ? this.transformMongoDoc(category) : undefined;
+  }
+
+  async createCategory(categoryData: InsertCategory): Promise<ProductCategory> {
+    const id = new ObjectId().toString();
+    const category = {
+      id,
+      ...categoryData,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    await this.db.collection('categories').insertOne(category);
+    return this.transformMongoDoc(category);
+  }
+
+  async updateCategory(id: string, categoryData: Partial<ProductCategory>): Promise<ProductCategory | undefined> {
+    const result = await this.db.collection('categories').findOneAndUpdate(
+      { id },
+      { $set: { ...categoryData, updatedAt: new Date() } },
+      { returnDocument: 'after' }
+    );
+    return result ? this.transformMongoDoc(result) : undefined;
+  }
+
+  async deleteCategory(id: string): Promise<boolean> {
+    const result = await this.db.collection('categories').updateOne(
+      { id },
+      { $set: { isActive: false, updatedAt: new Date() } }
+    );
+    return result.modifiedCount > 0;
+  }
+
+  async getCategoriesTree(): Promise<ProductCategory[]> {
+    const categories = await this.getCategories();
+    return categories;
+  }
+
+  // Price List operations
+  async getPriceLists(): Promise<PriceList[]> {
+    const priceLists = await this.db.collection('pricelists').find({ isActive: true }).toArray();
+    return priceLists.map((list: any) => this.transformMongoDoc(list));
+  }
+
+  async getPriceList(id: string): Promise<PriceList | undefined> {
+    const priceList = await this.db.collection('pricelists').findOne({ id });
+    return priceList ? this.transformMongoDoc(priceList) : undefined;
+  }
+
+  async createPriceList(priceListData: InsertPriceList): Promise<PriceList> {
+    const id = new ObjectId().toString();
+    const priceList = {
+      id,
+      ...priceListData,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    await this.db.collection('pricelists').insertOne(priceList);
+    return this.transformMongoDoc(priceList);
+  }
+
+  async updatePriceList(id: string, priceListData: Partial<PriceList>): Promise<PriceList | undefined> {
+    const result = await this.db.collection('pricelists').findOneAndUpdate(
+      { id },
+      { $set: { ...priceListData, updatedAt: new Date() } },
+      { returnDocument: 'after' }
+    );
+    return result ? this.transformMongoDoc(result) : undefined;
+  }
+
+  async deletePriceList(id: string): Promise<boolean> {
+    const result = await this.db.collection('pricelists').updateOne(
+      { id },
+      { $set: { isActive: false, updatedAt: new Date() } }
+    );
+    return result.modifiedCount > 0;
+  }
+
+  async getActivePriceLists(): Promise<PriceList[]> {
+    const now = new Date();
+    const priceLists = await this.db.collection('pricelists').find({
+      isActive: true,
+      validFrom: { $lte: now },
+      $or: [
+        { validTo: { $exists: false } },
+        { validTo: { $gte: now } }
+      ]
+    }).toArray();
+    return priceLists.map((list: any) => this.transformMongoDoc(list));
+  }
+
+  async getProductPrice(productId: string, priceListId?: string, quantity: number = 1): Promise<number> {
+    const product = await this.getProduct(productId);
+    if (!product) return 0;
+
+    let basePrice = product.basePrice;
+
+    if (priceListId) {
+      const priceList = await this.getPriceList(priceListId);
+      if (priceList) {
+        const productPrice = priceList.products.find(p => p.productId === productId && quantity >= p.minimumQuantity);
+        if (productPrice) {
+          basePrice = productPrice.price;
+        }
+      }
+    }
+
+    return basePrice;
+  }
+
+  // Discount operations
+  async getDiscounts(): Promise<Discount[]> {
+    const discounts = await this.db.collection('discounts').find({ isActive: true }).toArray();
+    return discounts.map((discount: any) => this.transformMongoDoc(discount));
+  }
+
+  async getDiscount(id: string): Promise<Discount | undefined> {
+    const discount = await this.db.collection('discounts').findOne({ id });
+    return discount ? this.transformMongoDoc(discount) : undefined;
+  }
+
+  async createDiscount(discountData: InsertDiscount): Promise<Discount> {
+    const id = new ObjectId().toString();
+    const discount = {
+      id,
+      ...discountData,
+      usedCount: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    await this.db.collection('discounts').insertOne(discount);
+    return this.transformMongoDoc(discount);
+  }
+
+  async updateDiscount(id: string, discountData: Partial<Discount>): Promise<Discount | undefined> {
+    const result = await this.db.collection('discounts').findOneAndUpdate(
+      { id },
+      { $set: { ...discountData, updatedAt: new Date() } },
+      { returnDocument: 'after' }
+    );
+    return result ? this.transformMongoDoc(result) : undefined;
+  }
+
+  async deleteDiscount(id: string): Promise<boolean> {
+    const result = await this.db.collection('discounts').updateOne(
+      { id },
+      { $set: { isActive: false, updatedAt: new Date() } }
+    );
+    return result.modifiedCount > 0;
+  }
+
+  async getActiveDiscounts(): Promise<Discount[]> {
+    const now = new Date();
+    const discounts = await this.db.collection('discounts').find({
+      isActive: true,
+      validFrom: { $lte: now },
+      validTo: { $gte: now },
+      $or: [
+        { usageLimit: { $exists: false } },
+        { $expr: { $lt: ["$usedCount", "$usageLimit"] } }
+      ]
+    }).toArray();
+    return discounts.map((discount: any) => this.transformMongoDoc(discount));
+  }
+
+  async calculateDiscount(productId: string, quantity: number, customerGroupId?: string): Promise<number> {
+    const activeDiscounts = await this.getActiveDiscounts();
+    let maxDiscount = 0;
+
+    for (const discount of activeDiscounts) {
+      let applies = false;
+
+      if (discount.applicationType === 'product' && discount.targetIds.includes(productId)) {
+        applies = true;
+      }
+
+      if (discount.applicationType === 'category') {
+        const product = await this.getProduct(productId);
+        if (product && discount.targetIds.includes(product.categoryId)) {
+          applies = true;
+        }
+      }
+
+      if (discount.applicationType === 'customer' && customerGroupId && discount.targetIds.includes(customerGroupId)) {
+        applies = true;
+      }
+
+      if (applies) {
+        if (discount.conditions.minimumQuantity && quantity < discount.conditions.minimumQuantity) {
+          continue;
+        }
+
+        if (discount.conditions.customerGroups && customerGroupId && !discount.conditions.customerGroups.includes(customerGroupId)) {
+          continue;
+        }
+
+        let discountValue = 0;
+        if (discount.type === 'percentage') {
+          const basePrice = await this.getProductPrice(productId);
+          discountValue = (basePrice * quantity * discount.value) / 100;
+        } else {
+          discountValue = discount.value;
+        }
+
+        maxDiscount = Math.max(maxDiscount, discountValue);
+      }
+    }
+
+    return maxDiscount;
+  }
+
+  // Customer Group operations
+  async getCustomerGroups(): Promise<CustomerGroup[]> {
+    const groups = await this.db.collection('customergroups').find({ isActive: true }).toArray();
+    return groups.map((group: any) => this.transformMongoDoc(group));
+  }
+
+  async getCustomerGroup(id: string): Promise<CustomerGroup | undefined> {
+    const group = await this.db.collection('customergroups').findOne({ id });
+    return group ? this.transformMongoDoc(group) : undefined;
+  }
+
+  async createCustomerGroup(groupData: InsertCustomerGroup): Promise<CustomerGroup> {
+    const id = new ObjectId().toString();
+    const group = {
+      id,
+      ...groupData,
+      createdAt: new Date(),
+    };
+    
+    await this.db.collection('customergroups').insertOne(group);
+    return this.transformMongoDoc(group);
+  }
+
+  async updateCustomerGroup(id: string, groupData: Partial<CustomerGroup>): Promise<CustomerGroup | undefined> {
+    const result = await this.db.collection('customergroups').findOneAndUpdate(
+      { id },
+      { $set: groupData },
+      { returnDocument: 'after' }
+    );
+    return result ? this.transformMongoDoc(result) : undefined;
+  }
+
+  async deleteCustomerGroup(id: string): Promise<boolean> {
+    const result = await this.db.collection('customergroups').updateOne(
+      { id },
+      { $set: { isActive: false } }
+    );
+    return result.modifiedCount > 0;
   }
 
   // Order operations

@@ -8,10 +8,15 @@ import {
   updatePasswordSchema,
   updateProfileSchema,
   productSchema,
+  categorySchema,
+  priceListSchema,
+  discountSchema,
+  customerGroupSchema,
   orderSchema,
   type UserSession,
   type UserRole,
 } from "@shared/schema";
+import { z } from "zod";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -296,6 +301,225 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(product);
     } catch (error) {
       console.error("Update product error:", error);
+      res.status(400).json({ message: "Invalid request" });
+    }
+  });
+
+  app.delete("/api/products/:id", requireAuth, requireRole(['admin', 'inventory']), async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteProduct(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+      res.json({ success: true, message: "Product deleted successfully" });
+    } catch (error) {
+      console.error("Delete product error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/products/search", async (req, res) => {
+    try {
+      const { q } = req.query;
+      if (!q || typeof q !== 'string') {
+        return res.status(400).json({ message: "Search query required" });
+      }
+      
+      const products = await storage.searchProducts(q);
+      res.json(products);
+    } catch (error) {
+      console.error("Search products error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/products/low-stock", requireAuth, async (req, res) => {
+    try {
+      const products = await storage.getLowStockProducts();
+      res.json(products);
+    } catch (error) {
+      console.error("Get low stock products error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.patch("/api/products/:id/stock", requireAuth, requireRole(['admin', 'inventory']), async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { quantity } = req.body;
+      
+      if (typeof quantity !== 'number') {
+        return res.status(400).json({ message: "Quantity must be a number" });
+      }
+      
+      const success = await storage.updateProductStock(id, quantity);
+      if (!success) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+      res.json({ success: true, message: "Stock updated successfully" });
+    } catch (error) {
+      console.error("Update stock error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Category routes
+  app.get("/api/categories", async (req, res) => {
+    try {
+      const categories = await storage.getCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Get categories error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/categories/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const category = await storage.getCategory(id);
+      
+      if (!category) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+
+      res.json(category);
+    } catch (error) {
+      console.error("Get category error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/categories", requireAuth, requireRole(['admin']), async (req, res) => {
+    try {
+      const categoryData = categorySchema.parse(req.body);
+      const category = await storage.createCategory(categoryData);
+      res.status(201).json(category);
+    } catch (error) {
+      console.error("Create category error:", error);
+      res.status(400).json({ message: "Invalid request" });
+    }
+  });
+
+  app.put("/api/categories/:id", requireAuth, requireRole(['admin']), async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = categorySchema.partial().parse(req.body);
+      
+      const category = await storage.updateCategory(id, updates);
+      if (!category) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+
+      res.json(category);
+    } catch (error) {
+      console.error("Update category error:", error);
+      res.status(400).json({ message: "Invalid request" });
+    }
+  });
+
+  app.delete("/api/categories/:id", requireAuth, requireRole(['admin']), async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteCategory(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Category not found" });
+      }
+
+      res.json({ success: true, message: "Category deleted successfully" });
+    } catch (error) {
+      console.error("Delete category error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Price List routes
+  app.get("/api/price-lists", requireAuth, requireRole(['admin', 'sales']), async (req, res) => {
+    try {
+      const priceLists = await storage.getPriceLists();
+      res.json(priceLists);
+    } catch (error) {
+      console.error("Get price lists error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/price-lists/active", async (req, res) => {
+    try {
+      const priceLists = await storage.getActivePriceLists();
+      res.json(priceLists);
+    } catch (error) {
+      console.error("Get active price lists error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/price-lists", requireAuth, requireRole(['admin', 'sales']), async (req, res) => {
+    try {
+      const priceListData = priceListSchema.parse(req.body);
+      const priceList = await storage.createPriceList(priceListData);
+      res.status(201).json(priceList);
+    } catch (error) {
+      console.error("Create price list error:", error);
+      res.status(400).json({ message: "Invalid request" });
+    }
+  });
+
+  // Discount routes
+  app.get("/api/discounts", requireAuth, requireRole(['admin', 'sales']), async (req, res) => {
+    try {
+      const discounts = await storage.getDiscounts();
+      res.json(discounts);
+    } catch (error) {
+      console.error("Get discounts error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/discounts/active", async (req, res) => {
+    try {
+      const discounts = await storage.getActiveDiscounts();
+      res.json(discounts);
+    } catch (error) {
+      console.error("Get active discounts error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/discounts", requireAuth, requireRole(['admin', 'sales']), async (req, res) => {
+    try {
+      const discountData = discountSchema.parse(req.body);
+      const discount = await storage.createDiscount(discountData);
+      res.status(201).json(discount);
+    } catch (error) {
+      console.error("Create discount error:", error);
+      res.status(400).json({ message: "Invalid request" });
+    }
+  });
+
+  // Customer Group routes
+  app.get("/api/customer-groups", requireAuth, requireRole(['admin', 'sales']), async (req, res) => {
+    try {
+      const groups = await storage.getCustomerGroups();
+      res.json(groups);
+    } catch (error) {
+      console.error("Get customer groups error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/customer-groups", requireAuth, requireRole(['admin', 'sales']), async (req, res) => {
+    try {
+      const groupData = customerGroupSchema.parse(req.body);
+      const group = await storage.createCustomerGroup(groupData);
+      res.status(201).json(group);
+    } catch (error) {
+      console.error("Create customer group error:", error);
       res.status(400).json({ message: "Invalid request" });
     }
   });
