@@ -473,7 +473,7 @@ export default function Discounts() {
 
                   <div>
                     <Label htmlFor="categoryId">Category (Optional)</Label>
-                    <Select name="categoryId">
+                    <Select value={createFormData.categoryId} onValueChange={(value) => setCreateFormData(prev => ({ ...prev, categoryId: value }))}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
@@ -496,8 +496,9 @@ export default function Discounts() {
                     <Label htmlFor="validFrom">Valid From</Label>
                     <Input
                       id="validFrom"
-                      name="validFrom"
                       type="datetime-local"
+                      value={createFormData.validFrom}
+                      onChange={(e) => setCreateFormData(prev => ({ ...prev, validFrom: e.target.value }))}
                       required
                     />
                   </div>
@@ -506,8 +507,9 @@ export default function Discounts() {
                     <Label htmlFor="validTo">Valid To</Label>
                     <Input
                       id="validTo"
-                      name="validTo"
                       type="datetime-local"
+                      value={createFormData.validTo}
+                      onChange={(e) => setCreateFormData(prev => ({ ...prev, validTo: e.target.value }))}
                       required
                     />
                   </div>
@@ -518,10 +520,11 @@ export default function Discounts() {
                     <Label htmlFor="minQuantity">Min Quantity</Label>
                     <Input
                       id="minQuantity"
-                      name="minQuantity"
                       type="number"
                       min="1"
                       placeholder="Optional"
+                      value={createFormData.minQuantity}
+                      onChange={(e) => setCreateFormData(prev => ({ ...prev, minQuantity: e.target.value }))}
                     />
                   </div>
 
@@ -540,10 +543,11 @@ export default function Discounts() {
                     <Label htmlFor="usageLimit">Usage Limit</Label>
                     <Input
                       id="usageLimit"
-                      name="usageLimit"
                       type="number"
                       min="1"
                       placeholder="Optional"
+                      value={createFormData.usageLimit}
+                      onChange={(e) => setCreateFormData(prev => ({ ...prev, usageLimit: e.target.value }))}
                     />
                   </div>
                 </div>
@@ -553,10 +557,11 @@ export default function Discounts() {
                     <Label htmlFor="minOrderValue">Min Order Value</Label>
                     <Input
                       id="minOrderValue"
-                      name="minOrderValue"
                       type="number"
                       step="0.01"
                       placeholder="Optional"
+                      value={createFormData.minOrderValue}
+                      onChange={(e) => setCreateFormData(prev => ({ ...prev, minOrderValue: e.target.value }))}
                     />
                   </div>
 
@@ -564,8 +569,9 @@ export default function Discounts() {
                     <Label htmlFor="customerGroup">Customer Group</Label>
                     <Input
                       id="customerGroup"
-                      name="customerGroup"
                       placeholder="e.g., Premium, VIP"
+                      value={createFormData.customerGroup}
+                      onChange={(e) => setCreateFormData(prev => ({ ...prev, customerGroup: e.target.value }))}
                     />
                   </div>
                 </div>
