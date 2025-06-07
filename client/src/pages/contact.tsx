@@ -83,12 +83,24 @@ export default function Contact() {
                     <MapPin className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-1">Address</h3>
-                    <p className="text-muted-foreground">
-                      Plot#75, Road# 9, IDA<br />
-                      Mallapur, Telangana - 500076<br />
-                      Hyderabad
-                    </p>
+                    <h3 className="font-semibold text-foreground mb-1">Our Locations</h3>
+                    <div className="text-muted-foreground space-y-3">
+                      <div>
+                        <strong>Telangana:</strong><br />
+                        Plot#75, Road# 9, IDA Mallapur<br />
+                        Hyderabad - 500076
+                      </div>
+                      <div>
+                        <strong>Karnataka:</strong><br />
+                        MICO Layout 2nd stage, Mico Layout<br />
+                        Bengaluru - 560068
+                      </div>
+                      <div>
+                        <strong>Andhra Pradesh:</strong><br />
+                        Survey# B16 & 17, New MRO Off. Rd, IDA<br />
+                        Tirupati - 517520
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
@@ -97,8 +109,12 @@ export default function Contact() {
                     <Phone className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-1">Phone</h3>
-                    <p className="text-muted-foreground">+91 98490 08282</p>
+                    <h3 className="font-semibold text-foreground mb-1">Call Us</h3>
+                    <div className="text-muted-foreground space-y-1">
+                      <p><strong>Hyderabad:</strong> +91 98490 08282</p>
+                      <p><strong>Bengaluru:</strong> +91 98490 08282</p>
+                      <p><strong>Tirupati:</strong> +91 97005 52003</p>
+                    </div>
                   </div>
                 </div>
                 
@@ -107,8 +123,8 @@ export default function Contact() {
                     <Mail className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-1">Email</h3>
-                    <p className="text-muted-foreground">orders@sunrisefoods</p>
+                    <h3 className="font-semibold text-foreground mb-1">Email Us</h3>
+                    <p className="text-muted-foreground">info@sunrisefoods.in</p>
                   </div>
                 </div>
                 
@@ -117,9 +133,9 @@ export default function Contact() {
                     <Clock className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-foreground mb-1">Hours</h3>
+                    <h3 className="font-semibold text-foreground mb-1">Opening Hours</h3>
                     <div className="text-muted-foreground space-y-1">
-                      <p>Monday - Saturday: 8:00 AM - 7:00 PM</p>
+                      <p>Monday - Saturday: 8:00 AM - 6:00 PM</p>
                       <p>Sunday: Closed</p>
                     </div>
                   </div>
