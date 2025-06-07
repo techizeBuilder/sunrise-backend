@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import ManagementLayout from "@/components/layout/management-layout";
 import { ImageUpload } from "@/components/ui/image-upload";
-import type { Discount, InsertDiscount, Product, ProductCategory } from "@shared/schema";
+import type { Discount, InsertDiscount } from "@shared/schema";
 
 export default function Discounts() {
   const { toast } = useToast();
@@ -24,15 +24,15 @@ export default function Discounts() {
   const [createImageUrl, setCreateImageUrl] = useState("");
   const [editImageUrl, setEditImageUrl] = useState("");
 
-  const { data: discounts, isLoading } = useQuery<Discount[]>({
+  const { data: discounts = [], isLoading } = useQuery({
     queryKey: ["/api/discounts"],
   });
 
-  const { data: products } = useQuery({
+  const { data: products = [] } = useQuery({
     queryKey: ["/api/products"],
   });
 
-  const { data: categories } = useQuery({
+  const { data: categories = [] } = useQuery({
     queryKey: ["/api/categories"],
   });
 
@@ -144,9 +144,12 @@ export default function Discounts() {
     updateMutation.mutate({ id: editingDiscount.id, data: discountData });
   };
 
-  const filteredDiscounts = (discounts || []).filter((discount: Discount) => {
-    const matchesSearch = discount.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      discount.description?.toLowerCase().includes(searchTerm.toLowerCase());
+  const discountsList = discounts || [];
+  const filteredDiscounts = discountsList.filter((discount: any) => {
+    if (!discount || typeof discount !== 'object') return false;
+    
+    const matchesSearch = discount.name?.toLowerCase()?.includes(searchTerm.toLowerCase()) ||
+      discount.description?.toLowerCase()?.includes(searchTerm.toLowerCase());
     
     const matchesType = filterType === "all" || discount.type === filterType;
     
@@ -418,13 +421,13 @@ export default function Discounts() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">None</SelectItem>
-                        {Array.isArray(products) ? products.map((product: any) => (
+                        {Array.isArray(products) && products.map((product: any) => (
                           product.id ? (
                             <SelectItem key={product.id} value={product.id}>
                               {product.name}
                             </SelectItem>
                           ) : null
-                        )) : []}
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -437,13 +440,13 @@ export default function Discounts() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">None</SelectItem>
-                        {Array.isArray(categories) ? categories.map((category: any) => (
+                        {Array.isArray(categories) && categories.map((category: any) => (
                           category.id ? (
                             <SelectItem key={category.id} value={category.id}>
                               {category.name}
                             </SelectItem>
                           ) : null
-                        )) : []}
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
