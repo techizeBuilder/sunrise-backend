@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { apiRequest } from "@/lib/queryClient";
 import { updateProfileSchema } from "@shared/schema";
@@ -20,11 +21,22 @@ export default function Profile() {
   const form = useForm({
     resolver: zodResolver(updateProfileSchema),
     defaultValues: {
-      firstName: user?.firstName || "",
-      lastName: user?.lastName || "",
-      email: user?.email || "",
+      firstName: "",
+      lastName: "",
+      email: "",
     },
   });
+
+  // Update form when user data is loaded
+  useEffect(() => {
+    if (user) {
+      form.reset({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        email: user.email || "",
+      });
+    }
+  }, [user, form]);
 
   const updateProfileMutation = useMutation({
     mutationFn: (data: any) => apiRequest("PUT", `/api/auth/profile`, data),
@@ -33,7 +45,7 @@ export default function Profile() {
         title: "Profile Updated",
         description: "Your profile has been successfully updated.",
       });
-      queryClient.invalidateQueries({ queryKey: ["auth", "me"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/me"] });
     },
     onError: (error: any) => {
       toast({
