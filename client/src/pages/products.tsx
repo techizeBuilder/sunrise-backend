@@ -88,6 +88,7 @@ export default function Products() {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       queryClient.invalidateQueries({ queryKey: ["/api/products/low-stock"] });
       setIsCreateDialogOpen(false);
+      setCreateImageUrl("");
       toast({ title: "Success", description: "Product created successfully" });
     },
     onError: (error) => {
@@ -104,6 +105,7 @@ export default function Products() {
       queryClient.invalidateQueries({ queryKey: ["/api/products/low-stock"] });
       setIsEditDialogOpen(false);
       setEditingProduct(null);
+      setEditImageUrl("");
       toast({ title: "Success", description: "Product updated successfully" });
     },
     onError: (error) => {
@@ -480,7 +482,10 @@ export default function Products() {
               <Input id="tags" name="tags" placeholder="e.g., organic, artisan, premium" />
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => {
+                setIsCreateDialogOpen(false);
+                setCreateImageUrl("");
+              }}>
                 Cancel
               </Button>
               <Button type="submit" disabled={createMutation.isPending}>
@@ -579,7 +584,11 @@ export default function Products() {
                 <Input id="edit-tags" name="tags" defaultValue={editingProduct.tags.join(", ")} />
               </div>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                <Button type="button" variant="outline" onClick={() => {
+                  setIsEditDialogOpen(false);
+                  setEditingProduct(null);
+                  setEditImageUrl("");
+                }}>
                   Cancel
                 </Button>
                 <Button type="submit" disabled={updateMutation.isPending}>
