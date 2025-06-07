@@ -173,7 +173,7 @@ export default function Products() {
 
   const getStockStatus = (product: Product) => {
     if (product.stock <= 0) return { label: "Out of Stock", variant: "destructive" as const };
-    if (product.stock <= product.minStock) return { label: "Low Stock", variant: "warning" as const };
+    if (product.stock <= product.minStock) return { label: "Low Stock", variant: "secondary" as const };
     return { label: "In Stock", variant: "default" as const };
   };
 
@@ -225,7 +225,7 @@ export default function Products() {
                       Stock: {product.stock} (Min: {product.minStock})
                     </p>
                   </div>
-                  <Badge variant="warning">Low Stock</Badge>
+                  <Badge variant="destructive">Low Stock</Badge>
                 </div>
               ))}
             </div>
@@ -373,7 +373,7 @@ export default function Products() {
                       <span>{getCategoryName(product.categoryId)}</span>
                       <span>Stock: {product.stock} {product.unit}</span>
                     </div>
-                    {product.tags.length > 0 && (
+                    {product.tags && product.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1">
                         {product.tags.slice(0, 3).map((tag) => (
                           <Badge key={tag} variant="outline" className="text-xs">
