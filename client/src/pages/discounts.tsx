@@ -23,6 +23,42 @@ export default function Discounts() {
   const [filterType, setFilterType] = useState<string>("all");
   const [createImageUrl, setCreateImageUrl] = useState("");
   const [editImageUrl, setEditImageUrl] = useState("");
+  
+  // Form state for create
+  const [createFormData, setCreateFormData] = useState({
+    name: "",
+    description: "",
+    type: "",
+    value: "",
+    applicationType: "",
+    productId: "",
+    categoryId: "",
+    customerGroup: "",
+    minQuantity: "",
+    minOrderValue: "",
+    validFrom: "",
+    validTo: "",
+    isActive: true,
+    usageLimit: ""
+  });
+
+  // Form state for edit
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    description: "",
+    type: "",
+    value: "",
+    applicationType: "",
+    productId: "",
+    categoryId: "",
+    customerGroup: "",
+    minQuantity: "",
+    minOrderValue: "",
+    validFrom: "",
+    validTo: "",
+    isActive: true,
+    usageLimit: ""
+  });
 
   const { data: discounts = [], isLoading } = useQuery({
     queryKey: ["/api/discounts"],
@@ -95,23 +131,23 @@ export default function Discounts() {
     },
   });
 
-  const handleCreateDiscount = (formData: FormData) => {
+  const handleCreateDiscount = () => {
     const discountData: InsertDiscount = {
-      name: formData.get("name") as string,
-      description: formData.get("description") as string,
-      type: formData.get("type") as "percentage" | "fixed_amount",
-      value: parseFloat(formData.get("value") as string),
-      applicationType: formData.get("applicationType") as "product" | "category" | "order" | "customer",
-      targetIds: [formData.get("productId") as string || formData.get("categoryId") as string || ""].filter(Boolean),
+      name: createFormData.name,
+      description: createFormData.description,
+      type: createFormData.type as "percentage" | "fixed_amount",
+      value: parseFloat(createFormData.value),
+      applicationType: createFormData.applicationType as "product" | "category" | "order" | "customer",
+      targetIds: [createFormData.productId || createFormData.categoryId || ""].filter(Boolean),
       conditions: {
-        minimumQuantity: parseInt(formData.get("minQuantity") as string) || undefined,
-        minimumOrderValue: parseFloat(formData.get("minOrderValue") as string) || undefined,
-        customerGroups: formData.get("customerGroup") ? [formData.get("customerGroup") as string] : undefined,
+        minimumQuantity: createFormData.minQuantity ? parseInt(createFormData.minQuantity) : undefined,
+        minimumOrderValue: createFormData.minOrderValue ? parseFloat(createFormData.minOrderValue) : undefined,
+        customerGroups: createFormData.customerGroup ? [createFormData.customerGroup] : undefined,
       },
-      validFrom: new Date(formData.get("validFrom") as string),
-      validTo: new Date(formData.get("validTo") as string),
-      isActive: formData.get("isActive") === "true",
-      usageLimit: parseInt(formData.get("usageLimit") as string) || undefined,
+      validFrom: createFormData.validFrom ? new Date(createFormData.validFrom) : new Date(),
+      validTo: createFormData.validTo ? new Date(createFormData.validTo) : new Date(),
+      isActive: createFormData.isActive,
+      usageLimit: createFormData.usageLimit ? parseInt(createFormData.usageLimit) : undefined,
       usedCount: 0,
       imageUrl: createImageUrl || undefined,
     };
@@ -119,32 +155,32 @@ export default function Discounts() {
     createMutation.mutate(discountData);
   };
 
-  const handleUpdateDiscount = (formData: FormData) => {
+  const handleUpdateDiscount = () => {
     if (!editingDiscount) return;
 
     const discountData: Partial<Discount> = {
-      name: formData.get("name") as string,
-      description: formData.get("description") as string,
-      type: formData.get("type") as "percentage" | "fixed_amount",
-      value: parseFloat(formData.get("value") as string),
-      applicationType: formData.get("applicationType") as "product" | "category" | "order" | "customer",
-      targetIds: [formData.get("productId") as string || formData.get("categoryId") as string || ""].filter(Boolean),
+      name: editFormData.name,
+      description: editFormData.description,
+      type: editFormData.type as "percentage" | "fixed_amount",
+      value: parseFloat(editFormData.value),
+      applicationType: editFormData.applicationType as "product" | "category" | "order" | "customer",
+      targetIds: [editFormData.productId || editFormData.categoryId || ""].filter(Boolean),
       conditions: {
-        minimumQuantity: parseInt(formData.get("minQuantity") as string) || undefined,
-        minimumOrderValue: parseFloat(formData.get("minOrderValue") as string) || undefined,
-        customerGroups: formData.get("customerGroup") ? [formData.get("customerGroup") as string] : undefined,
+        minimumQuantity: editFormData.minQuantity ? parseInt(editFormData.minQuantity) : undefined,
+        minimumOrderValue: editFormData.minOrderValue ? parseFloat(editFormData.minOrderValue) : undefined,
+        customerGroups: editFormData.customerGroup ? [editFormData.customerGroup] : undefined,
       },
-      validFrom: new Date(formData.get("validFrom") as string),
-      validTo: new Date(formData.get("validTo") as string),
-      isActive: formData.get("isActive") === "true",
-      usageLimit: parseInt(formData.get("usageLimit") as string) || undefined,
+      validFrom: editFormData.validFrom ? new Date(editFormData.validFrom) : new Date(),
+      validTo: editFormData.validTo ? new Date(editFormData.validTo) : new Date(),
+      isActive: editFormData.isActive,
+      usageLimit: editFormData.usageLimit ? parseInt(editFormData.usageLimit) : undefined,
       imageUrl: editImageUrl || editingDiscount.imageUrl,
     };
 
     updateMutation.mutate({ id: editingDiscount.id, data: discountData });
   };
 
-  const discountsList = discounts || [];
+  const discountsList = Array.isArray(discounts) ? discounts : [];
   const filteredDiscounts = discountsList.filter((discount: any) => {
     if (!discount || typeof discount !== 'object') return false;
     
