@@ -15,7 +15,17 @@ import {
   Package, 
   Calculator,
   Truck,
-  Factory
+  Factory,
+  Users,
+  TrendingUp,
+  AlertTriangle,
+  Plus,
+  Settings,
+  FileText,
+  BarChart3,
+  CheckCircle,
+  Clock,
+  DollarSign
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -200,24 +210,592 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          {/* Role-specific content placeholder */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Role-Specific Features</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <p className="text-gray-500 mb-4">
-                  Role-specific dashboard features will be displayed here.
-                </p>
-                <p className="text-sm text-gray-400">
-                  This dashboard demonstrates the role-based authentication system with secure access control.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Role-specific content */}
+          {user.role === "admin" && <AdminPanel />}
+          {user.role === "sales" && <SalesPanel />}
+          {user.role === "production" && <ProductionPanel />}
+          {user.role === "inventory" && <InventoryPanel />}
+          {user.role === "accounts" && <AccountsPanel />}
+          {user.role === "distributor" && <DistributorPanel />}
         </div>
       </main>
+    </div>
+  );
+}
+
+// Admin Panel Component
+function AdminPanel() {
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Users className="h-8 w-8 text-red-600" />
+              <div>
+                <p className="text-sm font-medium text-red-600">Total Users</p>
+                <p className="text-2xl font-bold text-red-700">142</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <ShoppingCart className="h-8 w-8 text-blue-600" />
+              <div>
+                <p className="text-sm font-medium text-blue-600">Total Orders</p>
+                <p className="text-2xl font-bold text-blue-700">1,284</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <DollarSign className="h-8 w-8 text-green-600" />
+              <div>
+                <p className="text-sm font-medium text-green-600">Revenue</p>
+                <p className="text-2xl font-bold text-green-700">₹2.4M</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-orange-200 bg-orange-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Package className="h-8 w-8 text-orange-600" />
+              <div>
+                <p className="text-sm font-medium text-orange-600">Products</p>
+                <p className="text-2xl font-bold text-orange-700">486</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Settings className="h-5 w-5" />
+              <span>System Management</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button className="w-full justify-start" variant="outline">
+              <Users className="h-4 w-4 mr-2" />
+              Manage Users & Roles
+            </Button>
+            <Button className="w-full justify-start" variant="outline">
+              <Settings className="h-4 w-4 mr-2" />
+              System Settings
+            </Button>
+            <Button className="w-full justify-start" variant="outline">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Analytics & Reports
+            </Button>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <AlertTriangle className="h-5 w-5 text-yellow-600" />
+              <span>System Alerts</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2 text-sm">
+                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                <span>Low stock alert: 12 items</span>
+              </div>
+              <div className="flex items-center space-x-2 text-sm">
+                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                <span>Pending orders: 23 items</span>
+              </div>
+              <div className="flex items-center space-x-2 text-sm">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span>System running normally</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// Sales Panel Component
+function SalesPanel() {
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <ShoppingCart className="h-8 w-8 text-blue-600" />
+              <div>
+                <p className="text-sm font-medium text-blue-600">My Orders</p>
+                <p className="text-2xl font-bold text-blue-700">84</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <TrendingUp className="h-8 w-8 text-green-600" />
+              <div>
+                <p className="text-sm font-medium text-green-600">Monthly Sales</p>
+                <p className="text-2xl font-bold text-green-700">₹485K</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-orange-200 bg-orange-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Clock className="h-8 w-8 text-orange-600" />
+              <div>
+                <p className="text-sm font-medium text-orange-600">Pending</p>
+                <p className="text-2xl font-bold text-orange-700">12</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Plus className="h-5 w-5" />
+              <span>Quick Actions</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button className="w-full justify-start">
+              <Plus className="h-4 w-4 mr-2" />
+              Create New Order
+            </Button>
+            <Button className="w-full justify-start" variant="outline">
+              <Users className="h-4 w-4 mr-2" />
+              Manage Customers
+            </Button>
+            <Button className="w-full justify-start" variant="outline">
+              <Truck className="h-4 w-4 mr-2" />
+              Track Deliveries
+            </Button>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Orders</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                <div>
+                  <p className="font-medium">Order #1234</p>
+                  <p className="text-sm text-gray-600">Rajesh Kumar - ₹2,450</p>
+                </div>
+                <Badge>Processing</Badge>
+              </div>
+              <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                <div>
+                  <p className="font-medium">Order #1235</p>
+                  <p className="text-sm text-gray-600">Priya Singh - ₹1,850</p>
+                </div>
+                <Badge variant="outline">Shipped</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// Production Panel Component
+function ProductionPanel() {
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Factory className="h-8 w-8 text-green-600" />
+              <div>
+                <p className="text-sm font-medium text-green-600">Active Batches</p>
+                <p className="text-2xl font-bold text-green-700">6</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="h-8 w-8 text-blue-600" />
+              <div>
+                <p className="text-sm font-medium text-blue-600">Completed Today</p>
+                <p className="text-2xl font-bold text-blue-700">24</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-yellow-200 bg-yellow-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Clock className="h-8 w-8 text-yellow-600" />
+              <div>
+                <p className="text-sm font-medium text-yellow-600">Pending</p>
+                <p className="text-2xl font-bold text-yellow-700">8</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Factory className="h-5 w-5" />
+              <span>Production Control</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button className="w-full justify-start">
+              <Plus className="h-4 w-4 mr-2" />
+              Start New Batch
+            </Button>
+            <Button className="w-full justify-start" variant="outline">
+              <Settings className="h-4 w-4 mr-2" />
+              Schedule Production
+            </Button>
+            <Button className="w-full justify-start" variant="outline">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Quality Control
+            </Button>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Active Production Batches</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                <div>
+                  <p className="font-medium">Batch #PB001</p>
+                  <p className="text-sm text-gray-600">Chocolate Cake - 50 units</p>
+                </div>
+                <Badge className="bg-green-100 text-green-800">In Progress</Badge>
+              </div>
+              <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                <div>
+                  <p className="font-medium">Batch #PB002</p>
+                  <p className="text-sm text-gray-600">Bread Loaves - 100 units</p>
+                </div>
+                <Badge className="bg-blue-100 text-blue-800">Ready</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// Inventory Panel Component
+function InventoryPanel() {
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="border-purple-200 bg-purple-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Package className="h-8 w-8 text-purple-600" />
+              <div>
+                <p className="text-sm font-medium text-purple-600">Total Items</p>
+                <p className="text-2xl font-bold text-purple-700">1,847</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <AlertTriangle className="h-8 w-8 text-red-600" />
+              <div>
+                <p className="text-sm font-medium text-red-600">Low Stock</p>
+                <p className="text-2xl font-bold text-red-700">12</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <TrendingUp className="h-8 w-8 text-green-600" />
+              <div>
+                <p className="text-sm font-medium text-green-600">In Stock</p>
+                <p className="text-2xl font-bold text-green-700">1,835</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Package className="h-5 w-5" />
+              <span>Inventory Management</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button className="w-full justify-start">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Stock Entry
+            </Button>
+            <Button className="w-full justify-start" variant="outline">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Stock Reports
+            </Button>
+            <Button className="w-full justify-start" variant="outline">
+              <AlertTriangle className="h-4 w-4 mr-2" />
+              Low Stock Alerts
+            </Button>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Low Stock Items</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center p-2 bg-red-50 rounded">
+                <div>
+                  <p className="font-medium">Flour (Premium)</p>
+                  <p className="text-sm text-gray-600">Stock: 15 kg</p>
+                </div>
+                <Badge variant="destructive">Critical</Badge>
+              </div>
+              <div className="flex justify-between items-center p-2 bg-yellow-50 rounded">
+                <div>
+                  <p className="font-medium">Sugar</p>
+                  <p className="text-sm text-gray-600">Stock: 25 kg</p>
+                </div>
+                <Badge className="bg-yellow-100 text-yellow-800">Low</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// Accounts Panel Component
+function AccountsPanel() {
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <DollarSign className="h-8 w-8 text-green-600" />
+              <div>
+                <p className="text-sm font-medium text-green-600">Monthly Income</p>
+                <p className="text-2xl font-bold text-green-700">₹845K</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-red-200 bg-red-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Calculator className="h-8 w-8 text-red-600" />
+              <div>
+                <p className="text-sm font-medium text-red-600">Monthly Expense</p>
+                <p className="text-2xl font-bold text-red-700">₹324K</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <TrendingUp className="h-8 w-8 text-blue-600" />
+              <div>
+                <p className="text-sm font-medium text-blue-600">Net Profit</p>
+                <p className="text-2xl font-bold text-blue-700">₹521K</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Calculator className="h-5 w-5" />
+              <span>Financial Management</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button className="w-full justify-start">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Financial Record
+            </Button>
+            <Button className="w-full justify-start" variant="outline">
+              <FileText className="h-4 w-4 mr-2" />
+              Generate Reports
+            </Button>
+            <Button className="w-full justify-start" variant="outline">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Budget Analysis
+            </Button>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Pending Approvals</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                <div>
+                  <p className="font-medium">Equipment Purchase</p>
+                  <p className="text-sm text-gray-600">₹45,000</p>
+                </div>
+                <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>
+              </div>
+              <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                <div>
+                  <p className="font-medium">Raw Material Cost</p>
+                  <p className="text-sm text-gray-600">₹12,500</p>
+                </div>
+                <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// Distributor Panel Component
+function DistributorPanel() {
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="border-orange-200 bg-orange-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Truck className="h-8 w-8 text-orange-600" />
+              <div>
+                <p className="text-sm font-medium text-orange-600">Assigned Deliveries</p>
+                <p className="text-2xl font-bold text-orange-700">18</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-green-200 bg-green-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="h-8 w-8 text-green-600" />
+              <div>
+                <p className="text-sm font-medium text-green-600">Completed</p>
+                <p className="text-2xl font-bold text-green-700">156</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-blue-200 bg-blue-50">
+          <CardContent className="p-4">
+            <div className="flex items-center space-x-2">
+              <Clock className="h-8 w-8 text-blue-600" />
+              <div>
+                <p className="text-sm font-medium text-blue-600">In Transit</p>
+                <p className="text-2xl font-bold text-blue-700">7</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Truck className="h-5 w-5" />
+              <span>Delivery Management</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Button className="w-full justify-start">
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Update Delivery Status
+            </Button>
+            <Button className="w-full justify-start" variant="outline">
+              <Clock className="h-4 w-4 mr-2" />
+              View Schedule
+            </Button>
+            <Button className="w-full justify-start" variant="outline">
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Delivery Reports
+            </Button>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Today's Deliveries</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                <div>
+                  <p className="font-medium">DEL-001</p>
+                  <p className="text-sm text-gray-600">Sector 15, Noida - 2.5 km</p>
+                </div>
+                <Badge className="bg-green-100 text-green-800">Ready</Badge>
+              </div>
+              <div className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                <div>
+                  <p className="font-medium">DEL-002</p>
+                  <p className="text-sm text-gray-600">Connaught Place - 8.2 km</p>
+                </div>
+                <Badge className="bg-blue-100 text-blue-800">In Transit</Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
