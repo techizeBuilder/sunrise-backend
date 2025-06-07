@@ -34,15 +34,94 @@ export interface Product {
   id: string;
   name: string;
   description: string;
-  price: string;
-  category: string;
+  basePrice: number;
+  categoryId: string;
   sku: string;
+  unit: "piece" | "kg" | "liter" | "gram" | "pack" | "box";
   stock: number;
   minStock: number;
   imageUrl: string;
+  images: string[]; // Multiple product images
+  specifications: Record<string, string>; // Key-value pairs for product specs
+  tags: string[];
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface ProductCategory {
+  _id?: string;
+  id: string;
+  name: string;
+  description: string;
+  parentId?: string; // For hierarchical categories
+  imageUrl?: string;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface PriceList {
+  _id?: string;
+  id: string;
+  name: string;
+  description: string;
+  type: "retail" | "wholesale" | "b2b" | "special";
+  isDefault: boolean;
+  minimumQuantity: number;
+  validFrom: Date;
+  validTo?: Date;
+  customerGroups: string[]; // Customer segments this applies to
+  products: PriceListProduct[];
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface PriceListProduct {
+  productId: string;
+  price: number;
+  discountPercentage?: number;
+  minimumQuantity: number;
+}
+
+export interface Discount {
+  _id?: string;
+  id: string;
+  name: string;
+  description: string;
+  type: "percentage" | "fixed_amount";
+  value: number; // Percentage or fixed amount
+  applicationType: "product" | "category" | "order" | "customer";
+  targetIds: string[]; // Product IDs, Category IDs, or Customer IDs
+  conditions: DiscountConditions;
+  validFrom: Date;
+  validTo: Date;
+  usageLimit?: number;
+  usedCount: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface DiscountConditions {
+  minimumOrderValue?: number;
+  minimumQuantity?: number;
+  customerGroups?: string[];
+  dayOfWeek?: number[]; // 0-6 for Sunday-Saturday
+  timeSlots?: { start: string; end: string }[]; // HH:MM format
+}
+
+export interface CustomerGroup {
+  _id?: string;
+  id: string;
+  name: string;
+  description: string;
+  discountPercentage: number;
+  priceListIds: string[];
+  isActive: boolean;
+  createdAt: Date;
 }
 
 // Orders
@@ -163,12 +242,75 @@ export const updateProfileSchema = z.object({
 export const productSchema = z.object({
   name: z.string().min(1, "Product name is required"),
   description: z.string().min(1, "Description is required"),
-  price: z.string().min(1, "Price is required"),
-  category: z.string().min(1, "Category is required"),
+  basePrice: z.number().min(0, "Base price cannot be negative"),
+  categoryId: z.string().min(1, "Category is required"),
   sku: z.string().min(1, "SKU is required"),
+  unit: z.enum(["piece", "kg", "liter", "gram", "pack", "box"]),
   stock: z.number().min(0, "Stock cannot be negative"),
   minStock: z.number().min(0, "Minimum stock cannot be negative"),
   imageUrl: z.string().url("Invalid image URL"),
+  images: z.array(z.string().url()).default([]),
+  specifications: z.record(z.string()).default({}),
+  tags: z.array(z.string()).default([]),
+  isActive: z.boolean().default(true),
+});
+
+export const categorySchema = z.object({
+  name: z.string().min(1, "Category name is required"),
+  description: z.string().min(1, "Description is required"),
+  parentId: z.string().optional(),
+  imageUrl: z.string().url().optional(),
+  sortOrder: z.number().default(0),
+  isActive: z.boolean().default(true),
+});
+
+export const priceListSchema = z.object({
+  name: z.string().min(1, "Price list name is required"),
+  description: z.string().min(1, "Description is required"),
+  type: z.enum(["retail", "wholesale", "b2b", "special"]),
+  isDefault: z.boolean().default(false),
+  minimumQuantity: z.number().min(1, "Minimum quantity must be at least 1"),
+  validFrom: z.date(),
+  validTo: z.date().optional(),
+  customerGroups: z.array(z.string()).default([]),
+  products: z.array(z.object({
+    productId: z.string(),
+    price: z.number().min(0),
+    discountPercentage: z.number().min(0).max(100).optional(),
+    minimumQuantity: z.number().min(1),
+  })).default([]),
+  isActive: z.boolean().default(true),
+});
+
+export const discountSchema = z.object({
+  name: z.string().min(1, "Discount name is required"),
+  description: z.string().min(1, "Description is required"),
+  type: z.enum(["percentage", "fixed_amount"]),
+  value: z.number().min(0, "Discount value cannot be negative"),
+  applicationType: z.enum(["product", "category", "order", "customer"]),
+  targetIds: z.array(z.string()).default([]),
+  conditions: z.object({
+    minimumOrderValue: z.number().min(0).optional(),
+    minimumQuantity: z.number().min(1).optional(),
+    customerGroups: z.array(z.string()).optional(),
+    dayOfWeek: z.array(z.number().min(0).max(6)).optional(),
+    timeSlots: z.array(z.object({
+      start: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/),
+      end: z.string().regex(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/),
+    })).optional(),
+  }).default({}),
+  validFrom: z.date(),
+  validTo: z.date(),
+  usageLimit: z.number().min(1).optional(),
+  usedCount: z.number().default(0),
+  isActive: z.boolean().default(true),
+});
+
+export const customerGroupSchema = z.object({
+  name: z.string().min(1, "Customer group name is required"),
+  description: z.string().min(1, "Description is required"),
+  discountPercentage: z.number().min(0).max(100),
+  priceListIds: z.array(z.string()).default([]),
   isActive: z.boolean().default(true),
 });
 
@@ -190,4 +332,8 @@ export type ResetPasswordData = z.infer<typeof resetPasswordSchema>;
 export type UpdatePasswordData = z.infer<typeof updatePasswordSchema>;
 export type UpdateProfileData = z.infer<typeof updateProfileSchema>;
 export type InsertProduct = z.infer<typeof productSchema>;
+export type InsertCategory = z.infer<typeof categorySchema>;
+export type InsertPriceList = z.infer<typeof priceListSchema>;
+export type InsertDiscount = z.infer<typeof discountSchema>;
+export type InsertCustomerGroup = z.infer<typeof customerGroupSchema>;
 export type InsertOrder = z.infer<typeof orderSchema>;

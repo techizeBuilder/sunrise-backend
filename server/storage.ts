@@ -3,6 +3,10 @@ import {
   type UserSession,
   type UserRole,
   type Product,
+  type ProductCategory,
+  type PriceList,
+  type Discount,
+  type CustomerGroup,
   type Order,
   type ProductionBatch,
   type InventoryMovement,
@@ -10,6 +14,10 @@ import {
   type Distributor,
   type InsertUser,
   type InsertProduct,
+  type InsertCategory,
+  type InsertPriceList,
+  type InsertDiscount,
+  type InsertCustomerGroup,
   type InsertOrder,
 } from "@shared/schema";
 import { connectToDatabase } from "./db";
@@ -38,6 +46,41 @@ export interface IStorage {
   deleteProduct(id: string): Promise<boolean>;
   updateProductStock(id: string, quantity: number): Promise<boolean>;
   getLowStockProducts(): Promise<Product[]>;
+  getProductsByCategory(categoryId: string): Promise<Product[]>;
+  searchProducts(query: string): Promise<Product[]>;
+
+  // Category operations
+  getCategories(): Promise<ProductCategory[]>;
+  getCategory(id: string): Promise<ProductCategory | undefined>;
+  createCategory(category: InsertCategory): Promise<ProductCategory>;
+  updateCategory(id: string, category: Partial<ProductCategory>): Promise<ProductCategory | undefined>;
+  deleteCategory(id: string): Promise<boolean>;
+  getCategoriesTree(): Promise<ProductCategory[]>;
+
+  // Price List operations
+  getPriceLists(): Promise<PriceList[]>;
+  getPriceList(id: string): Promise<PriceList | undefined>;
+  createPriceList(priceList: InsertPriceList): Promise<PriceList>;
+  updatePriceList(id: string, priceList: Partial<PriceList>): Promise<PriceList | undefined>;
+  deletePriceList(id: string): Promise<boolean>;
+  getActivePriceLists(): Promise<PriceList[]>;
+  getProductPrice(productId: string, priceListId?: string, quantity?: number): Promise<number>;
+
+  // Discount operations
+  getDiscounts(): Promise<Discount[]>;
+  getDiscount(id: string): Promise<Discount | undefined>;
+  createDiscount(discount: InsertDiscount): Promise<Discount>;
+  updateDiscount(id: string, discount: Partial<Discount>): Promise<Discount | undefined>;
+  deleteDiscount(id: string): Promise<boolean>;
+  getActiveDiscounts(): Promise<Discount[]>;
+  calculateDiscount(productId: string, quantity: number, customerGroupId?: string): Promise<number>;
+
+  // Customer Group operations
+  getCustomerGroups(): Promise<CustomerGroup[]>;
+  getCustomerGroup(id: string): Promise<CustomerGroup | undefined>;
+  createCustomerGroup(group: InsertCustomerGroup): Promise<CustomerGroup>;
+  updateCustomerGroup(id: string, group: Partial<CustomerGroup>): Promise<CustomerGroup | undefined>;
+  deleteCustomerGroup(id: string): Promise<boolean>;
 
   // Order operations
   getOrders(): Promise<Order[]>;
@@ -124,39 +167,65 @@ export class MongoStorage implements IStorage {
       } as InsertUser);
     }
 
-    // Create sample products
+    // Create sample categories first
+    const sampleCategories = [
+      { name: "Breads", description: "Fresh baked breads and artisan loaves", sortOrder: 1, isActive: true },
+      { name: "Cakes", description: "Celebration cakes and desserts", sortOrder: 2, isActive: true },
+      { name: "Pastries", description: "Flaky pastries and sweet treats", sortOrder: 3, isActive: true },
+      { name: "Cookies", description: "Crispy and soft baked cookies", sortOrder: 4, isActive: true },
+    ];
+
+    const categoryIds = {};
+    for (const categoryData of sampleCategories) {
+      const category = await this.createCategory(categoryData);
+      categoryIds[categoryData.name.toLowerCase()] = category.id;
+    }
+
+    // Create sample products with updated schema
     const sampleProducts = [
       {
         name: "Classic Sourdough",
         description: "Traditional sourdough with perfect crust and tangy flavor",
-        price: "₹85",
-        category: "breads",
+        basePrice: 85,
+        categoryId: categoryIds.breads,
         sku: "BR001",
+        unit: "piece" as const,
         stock: 50,
         minStock: 10,
         imageUrl: "https://images.unsplash.com/photo-1549931319-a545dcf3bc73?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+        images: [],
+        specifications: { weight: "500g", ingredients: "Flour, Water, Salt, Sourdough Starter" },
+        tags: ["artisan", "traditional", "organic"],
         isActive: true,
       },
       {
         name: "Multigrain Harvest",
         description: "Hearty blend of whole grains, seeds, and nuts",
-        price: "₹92",
-        category: "breads",
+        basePrice: 92,
+        categoryId: categoryIds.breads,
         sku: "BR002",
+        unit: "piece" as const,
         stock: 30,
         minStock: 8,
         imageUrl: "https://images.unsplash.com/photo-1586444248902-2f64eddc13df?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+        images: [],
+        specifications: { weight: "600g", ingredients: "Mixed grains, Seeds, Nuts, Flour" },
+        tags: ["healthy", "multigrain", "nutritious"],
         isActive: true,
       },
       {
         name: "Chocolate Layer Cake",
         description: "Rich chocolate cake with layers of buttercream frosting",
-        price: "₹450",
-        category: "cakes",
+        basePrice: 450,
+        categoryId: categoryIds.cakes,
         sku: "CK001",
+        unit: "piece" as const,
         stock: 15,
         minStock: 5,
         imageUrl: "https://images.unsplash.com/photo-1578775887804-699de7086ff9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
+        images: [],
+        specifications: { size: "8 inch", serves: "8-10 people", layers: "3" },
+        tags: ["celebration", "chocolate", "premium"],
         isActive: true,
       },
     ];
@@ -164,6 +233,31 @@ export class MongoStorage implements IStorage {
     for (const product of sampleProducts) {
       await this.createProduct(product);
     }
+
+    // Create sample price lists
+    const retailPriceList = await this.createPriceList({
+      name: "Retail Prices",
+      description: "Standard retail pricing for walk-in customers",
+      type: "retail",
+      isDefault: true,
+      minimumQuantity: 1,
+      validFrom: new Date(),
+      customerGroups: [],
+      products: [],
+      isActive: true,
+    });
+
+    const wholesalePriceList = await this.createPriceList({
+      name: "Wholesale Prices",
+      description: "Bulk pricing for wholesale customers",
+      type: "wholesale",
+      isDefault: false,
+      minimumQuantity: 50,
+      validFrom: new Date(),
+      customerGroups: [],
+      products: [],
+      isActive: true,
+    });
   }
 
   // User operations
