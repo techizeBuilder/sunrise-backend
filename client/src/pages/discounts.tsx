@@ -24,23 +24,20 @@ export default function Discounts() {
   const [createImageUrl, setCreateImageUrl] = useState("");
   const [editImageUrl, setEditImageUrl] = useState("");
 
-  const { data: discounts, isLoading } = useQuery({
+  const { data: discounts, isLoading } = useQuery<Discount[]>({
     queryKey: ["/api/discounts"],
   });
 
-  const { data: products } = useQuery({
+  const { data: products } = useQuery<Product[]>({
     queryKey: ["/api/products"],
   });
 
-  const { data: categories } = useQuery({
+  const { data: categories } = useQuery<ProductCategory[]>({
     queryKey: ["/api/categories"],
   });
 
   const createMutation = useMutation({
-    mutationFn: (data: InsertDiscount) => apiRequest("/api/discounts", {
-      method: "POST",
-      body: data,
-    }),
+    mutationFn: (data: InsertDiscount) => apiRequest("POST", "/api/discounts", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/discounts"] });
       setIsCreateDialogOpen(false);
@@ -61,10 +58,7 @@ export default function Discounts() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Discount> }) =>
-      apiRequest(`/api/discounts/${id}`, {
-        method: "PATCH",
-        body: data,
-      }),
+      apiRequest("PATCH", `/api/discounts/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/discounts"] });
       setEditingDiscount(null);
@@ -84,9 +78,7 @@ export default function Discounts() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/discounts/${id}`, {
-      method: "DELETE",
-    }),
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/discounts/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/discounts"] });
       toast({
@@ -152,14 +144,14 @@ export default function Discounts() {
     updateMutation.mutate({ id: editingDiscount.id, data: discountData });
   };
 
-  const filteredDiscounts = discounts?.filter((discount: Discount) => {
+  const filteredDiscounts = (discounts || []).filter((discount: Discount) => {
     const matchesSearch = discount.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       discount.description?.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesType = filterType === "all" || discount.type === filterType;
     
     return matchesSearch && matchesType;
-  }) || [];
+  });
 
   const getDiscountTypeColor = (type: string) => {
     switch (type) {
@@ -426,7 +418,7 @@ export default function Discounts() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">None</SelectItem>
-                        {products?.map((product: any) => (
+                        {(products || []).map((product: Product) => (
                           product.id ? (
                             <SelectItem key={product.id} value={product.id}>
                               {product.name}
