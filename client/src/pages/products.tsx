@@ -35,6 +35,8 @@ export default function Products() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
+  const [createImageUrl, setCreateImageUrl] = useState("");
+  const [editImageUrl, setEditImageUrl] = useState("");
 
   // Check user permissions
   const canManageProducts = user?.role === 'admin' || user?.role === 'inventory';
@@ -135,7 +137,7 @@ export default function Products() {
       unit: formData.get("unit") as "piece" | "kg" | "liter" | "gram" | "pack" | "box",
       stock: parseInt(formData.get("stock") as string),
       minStock: parseInt(formData.get("minStock") as string),
-      imageUrl: formData.get("imageUrl") as string,
+      imageUrl: createImageUrl,
       images: [],
       specifications: {},
       tags: (formData.get("tags") as string).split(",").map(tag => tag.trim()).filter(Boolean),
@@ -160,7 +162,7 @@ export default function Products() {
       unit: formData.get("unit") as "piece" | "kg" | "liter" | "gram" | "pack" | "box",
       stock: parseInt(formData.get("stock") as string),
       minStock: parseInt(formData.get("minStock") as string),
-      imageUrl: formData.get("imageUrl") as string,
+      imageUrl: editImageUrl || editingProduct.imageUrl,
       tags: (formData.get("tags") as string).split(",").map(tag => tag.trim()).filter(Boolean),
     };
 
@@ -465,8 +467,13 @@ export default function Products() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="imageUrl">Image URL</Label>
-              <Input id="imageUrl" name="imageUrl" type="url" required />
+              <Label>Product Image</Label>
+              <ImageUpload
+                onImageUpload={setCreateImageUrl}
+                currentImage={createImageUrl}
+                uploadEndpoint="/api/upload/product"
+                label="Upload Product Image"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="tags">Tags (comma-separated)</Label>
@@ -559,8 +566,13 @@ export default function Products() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-imageUrl">Image URL</Label>
-                <Input id="edit-imageUrl" name="imageUrl" type="url" defaultValue={editingProduct.imageUrl} required />
+                <Label>Product Image</Label>
+                <ImageUpload
+                  onImageUpload={setEditImageUrl}
+                  currentImage={editImageUrl}
+                  uploadEndpoint="/api/upload/product"
+                  label="Upload Product Image"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit-tags">Tags (comma-separated)</Label>
