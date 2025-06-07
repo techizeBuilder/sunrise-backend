@@ -58,10 +58,23 @@ export function ImageUpload({
       const response = await fetch(uploadEndpoint, {
         method: 'POST',
         body: formData,
+        credentials: 'include',
       });
 
       if (!response.ok) {
-        throw new Error('Upload failed');
+        if (response.status === 401) {
+          toast({
+            title: "Authentication Required",
+            description: "Please log in to upload images.",
+            variant: "destructive",
+          });
+          // Redirect to login after a brief delay
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 1500);
+          return;
+        }
+        throw new Error(`Upload failed: ${response.statusText}`);
       }
 
       const result = await response.json();
