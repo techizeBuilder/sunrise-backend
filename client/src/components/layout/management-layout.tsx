@@ -14,7 +14,7 @@ export default function ManagementLayout({ children }: ManagementLayoutProps) {
 
   const handleLogout = async () => {
     try {
-      await apiRequest("/api/auth/logout", { method: "POST" });
+      await apiRequest("POST", "/api/auth/logout");
       window.location.href = "/login";
     } catch (error) {
       console.error("Logout error:", error);
