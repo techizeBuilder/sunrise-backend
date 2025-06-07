@@ -382,7 +382,7 @@ export default function Discounts() {
             </DialogHeader>
             <form onSubmit={(e) => {
               e.preventDefault();
-              handleCreateDiscount(new FormData(e.target as HTMLFormElement));
+              handleCreateDiscount();
             }}>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -390,15 +390,16 @@ export default function Discounts() {
                     <Label htmlFor="name">Name</Label>
                     <Input
                       id="name"
-                      name="name"
                       placeholder="e.g., Summer Sale 20%"
+                      value={createFormData.name}
+                      onChange={(e) => setCreateFormData(prev => ({ ...prev, name: e.target.value }))}
                       required
                     />
                   </div>
                   
                   <div>
                     <Label htmlFor="type">Discount Type</Label>
-                    <Select name="type" required>
+                    <Select value={createFormData.type} onValueChange={(value) => setCreateFormData(prev => ({ ...prev, type: value }))}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select discount type" />
                       </SelectTrigger>
@@ -415,8 +416,9 @@ export default function Discounts() {
                   <Label htmlFor="description">Description</Label>
                   <Textarea
                     id="description"
-                    name="description"
                     placeholder="Description of this discount..."
+                    value={createFormData.description}
+                    onChange={(e) => setCreateFormData(prev => ({ ...prev, description: e.target.value }))}
                   />
                 </div>
 
@@ -425,17 +427,18 @@ export default function Discounts() {
                     <Label htmlFor="value">Discount Value</Label>
                     <Input
                       id="value"
-                      name="value"
                       type="number"
                       step="0.01"
                       placeholder="e.g., 20 for 20% or 100 for ₹100"
+                      value={createFormData.value}
+                      onChange={(e) => setCreateFormData(prev => ({ ...prev, value: e.target.value }))}
                       required
                     />
                   </div>
 
                   <div>
                     <Label htmlFor="applicationType">Application Type</Label>
-                    <Select name="applicationType" required>
+                    <Select value={createFormData.applicationType} onValueChange={(value) => setCreateFormData(prev => ({ ...prev, applicationType: value }))}>
                       <SelectTrigger>
                         <SelectValue placeholder="Where to apply" />
                       </SelectTrigger>
@@ -451,7 +454,7 @@ export default function Discounts() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="productId">Product (Optional)</Label>
-                    <Select name="productId">
+                    <Select value={createFormData.productId} onValueChange={(value) => setCreateFormData(prev => ({ ...prev, productId: value }))}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select specific product" />
                       </SelectTrigger>
@@ -615,7 +618,7 @@ export default function Discounts() {
             {editingDiscount && (
               <form onSubmit={(e) => {
                 e.preventDefault();
-                handleUpdateDiscount(new FormData(e.target as HTMLFormElement));
+                handleUpdateDiscount();
               }}>
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
