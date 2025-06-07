@@ -25,7 +25,7 @@ export default function Categories() {
 
   // Create category mutation
   const createMutation = useMutation({
-    mutationFn: (data: InsertCategory) => apiRequest("/api/categories", { method: "POST", body: data }),
+    mutationFn: (data: InsertCategory) => apiRequest("POST", "/api/categories", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
       setIsCreateDialogOpen(false);
@@ -39,7 +39,7 @@ export default function Categories() {
   // Update category mutation
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<ProductCategory> }) =>
-      apiRequest(`/api/categories/${id}`, { method: "PUT", body: data }),
+      apiRequest("PUT", `/api/categories/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
       setIsEditDialogOpen(false);
@@ -53,7 +53,7 @@ export default function Categories() {
 
   // Delete category mutation
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/categories/${id}`, { method: "DELETE" }),
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/categories/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
       toast({ title: "Success", description: "Category deleted successfully" });

@@ -47,7 +47,7 @@ export default function Products() {
 
   // Create product mutation
   const createMutation = useMutation({
-    mutationFn: (data: InsertProduct) => apiRequest("/api/products", { method: "POST", body: data }),
+    mutationFn: (data: InsertProduct) => apiRequest("POST", "/api/products", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       queryClient.invalidateQueries({ queryKey: ["/api/products/low-stock"] });
@@ -62,7 +62,7 @@ export default function Products() {
   // Update product mutation
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Product> }) =>
-      apiRequest(`/api/products/${id}`, { method: "PUT", body: data }),
+      apiRequest("PUT", `/api/products/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       queryClient.invalidateQueries({ queryKey: ["/api/products/low-stock"] });
@@ -77,7 +77,7 @@ export default function Products() {
 
   // Delete product mutation
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/products/${id}`, { method: "DELETE" }),
+    mutationFn: (id: string) => apiRequest("DELETE", `/api/products/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       queryClient.invalidateQueries({ queryKey: ["/api/products/low-stock"] });
