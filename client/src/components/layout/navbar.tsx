@@ -22,9 +22,11 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16 px-4">
           <div className="flex items-center">
             <Link href="/">
-              <h1 className="text-2xl text-heading font-bold text-primary hover:text-primary/80 transition-colors">
-                Golden Crust
-              </h1>
+              <img 
+                src="/logo.png" 
+                alt="Golden Crust Bakery" 
+                className="h-12 w-auto hover:opacity-80 transition-opacity"
+              />
             </Link>
           </div>
           
