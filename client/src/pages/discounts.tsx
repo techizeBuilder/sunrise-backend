@@ -112,10 +112,9 @@ export default function Discounts() {
       applicationType: formData.get("applicationType") as "product" | "category" | "order" | "customer",
       targetIds: [formData.get("productId") as string || formData.get("categoryId") as string || ""].filter(Boolean),
       conditions: {
-        minQuantity: parseInt(formData.get("minQuantity") as string) || undefined,
-        maxQuantity: parseInt(formData.get("maxQuantity") as string) || undefined,
-        minOrderValue: parseFloat(formData.get("minOrderValue") as string) || undefined,
-        customerGroup: formData.get("customerGroup") as string || undefined,
+        minimumQuantity: parseInt(formData.get("minQuantity") as string) || undefined,
+        minimumOrderValue: parseFloat(formData.get("minOrderValue") as string) || undefined,
+        customerGroups: formData.get("customerGroup") ? [formData.get("customerGroup") as string] : undefined,
       },
       validFrom: new Date(formData.get("validFrom") as string),
       validTo: new Date(formData.get("validTo") as string),
@@ -139,10 +138,9 @@ export default function Discounts() {
       applicationType: formData.get("applicationType") as "product" | "category" | "order" | "customer",
       targetIds: [formData.get("productId") as string || formData.get("categoryId") as string || ""].filter(Boolean),
       conditions: {
-        minQuantity: parseInt(formData.get("minQuantity") as string) || undefined,
-        maxQuantity: parseInt(formData.get("maxQuantity") as string) || undefined,
-        minOrderValue: parseFloat(formData.get("minOrderValue") as string) || undefined,
-        customerGroup: formData.get("customerGroup") as string || undefined,
+        minimumQuantity: parseInt(formData.get("minQuantity") as string) || undefined,
+        minimumOrderValue: parseFloat(formData.get("minOrderValue") as string) || undefined,
+        customerGroups: formData.get("customerGroup") ? [formData.get("customerGroup") as string] : undefined,
       },
       validFrom: new Date(formData.get("validFrom") as string),
       validTo: new Date(formData.get("validTo") as string),
@@ -314,17 +312,17 @@ export default function Discounts() {
                         </span>
                       </div>
 
-                      {discount.minQuantity && (
+                      {discount.conditions?.minimumQuantity && (
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">Min Quantity:</span>
-                          <span className="text-sm">{discount.minQuantity}</span>
+                          <span className="text-sm">{discount.conditions.minimumQuantity}</span>
                         </div>
                       )}
 
-                      {discount.minOrderValue && (
+                      {discount.conditions?.minimumOrderValue && (
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">Min Order:</span>
-                          <span className="text-sm">₹{discount.minOrderValue}</span>
+                          <span className="text-sm">₹{discount.conditions.minimumOrderValue}</span>
                         </div>
                       )}
 

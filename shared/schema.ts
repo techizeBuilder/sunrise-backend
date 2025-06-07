@@ -114,6 +114,8 @@ export interface DiscountConditions {
   timeSlots?: { start: string; end: string }[]; // HH:MM format
 }
 
+export type InsertDiscount = Omit<Discount, '_id' | 'id' | 'createdAt' | 'updatedAt'>;
+
 export interface CustomerGroup {
   _id?: string;
   id: string;
@@ -335,6 +337,6 @@ export type UpdateProfileData = z.infer<typeof updateProfileSchema>;
 export type InsertProduct = z.infer<typeof productSchema>;
 export type InsertCategory = z.infer<typeof categorySchema>;
 export type InsertPriceList = z.infer<typeof priceListSchema>;
-export type InsertDiscount = z.infer<typeof discountSchema>;
+
 export type InsertCustomerGroup = z.infer<typeof customerGroupSchema>;
 export type InsertOrder = z.infer<typeof orderSchema>;
