@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import express, { type Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import {
@@ -22,6 +22,9 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import session from "express-session";
 import { Request, Response, NextFunction } from "express";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 
 // Extend session type
 declare module 'express-session' {
@@ -42,6 +45,38 @@ const sessionConfig = {
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 };
+
+// Multer configuration for file uploads
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      const uploadPath = req.path.includes('/products') ? './uploads/products' :
+                        req.path.includes('/categories') ? './uploads/categories' :
+                        req.path.includes('/discounts') ? './uploads/discounts' :
+                        './uploads';
+      
+      // Ensure directory exists
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
+      }
+      cb(null, uploadPath);
+    },
+    filename: (req, file, cb) => {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    }
+  }),
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
 
 // Extended Request interface for session
 interface AuthenticatedRequest extends Request {
@@ -68,6 +103,9 @@ const requireRole = (roles: UserRole[]) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Serve static files from uploads directory
+  app.use('/uploads', express.static('uploads'));
+  
   // Session middleware
   app.use(session(sessionConfig));
 
@@ -394,6 +432,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Update stock error:", error);
       res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Image upload routes
+  app.post("/api/upload/product", requireAuth, requireRole(['admin', 'inventory']), upload.single('image'), (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      const imageUrl = `/uploads/products/${req.file.filename}`;
+      res.json({ imageUrl, filename: req.file.filename });
+    } catch (error) {
+      console.error("Product image upload error:", error);
+      res.status(500).json({ message: "Failed to upload image" });
+    }
+  });
+
+  app.post("/api/upload/category", requireAuth, requireRole(['admin']), upload.single('image'), (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      const imageUrl = `/uploads/categories/${req.file.filename}`;
+      res.json({ imageUrl, filename: req.file.filename });
+    } catch (error) {
+      console.error("Category image upload error:", error);
+      res.status(500).json({ message: "Failed to upload image" });
+    }
+  });
+
+  app.post("/api/upload/discount", requireAuth, requireRole(['admin', 'sales']), upload.single('image'), (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+      
+      const imageUrl = `/uploads/discounts/${req.file.filename}`;
+      res.json({ imageUrl, filename: req.file.filename });
+    } catch (error) {
+      console.error("Discount image upload error:", error);
+      res.status(500).json({ message: "Failed to upload image" });
     }
   });
 
