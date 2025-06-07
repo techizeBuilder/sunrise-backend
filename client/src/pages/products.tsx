@@ -14,26 +14,59 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import ManagementLayout from "@/components/layout/management-layout";
 import type { Product, ProductCategory, InsertProduct } from "@shared/schema";
 
+// Hook to get current user
+function useAuth() {
+  const { data: user } = useQuery({
+    queryKey: ["/api/auth/me"],
+    retry: false,
+  });
+  return { user, isAuthenticated: !!user };
+}
+
 export default function Products() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [stockFilter, setStockFilter] = useState("all");
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
 
+  // Check user permissions
+  const canManageProducts = user?.role === 'admin' || user?.role === 'inventory';
+  const canCreateProducts = user?.role === 'admin';
+  const canDeleteProducts = user?.role === 'admin';
+
   // Fetch products
-  const { data: products = [], isLoading: productsLoading } = useQuery({
-    queryKey: ["/api/products", searchQuery, selectedCategory],
-    queryFn: () => {
-      const params = new URLSearchParams();
-      if (searchQuery) params.append("search", searchQuery);
-      if (selectedCategory) params.append("category", selectedCategory);
-      return apiRequest(`/api/products?${params.toString()}`);
-    },
+  const { data: allProducts = [], isLoading: productsLoading } = useQuery({
+    queryKey: ["/api/products"],
   });
+
+  // Client-side filtering for better user experience
+  const filteredProducts = allProducts.filter((product: Product) => {
+    // Search filter
+    if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        !product.description.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+    
+    // Category filter
+    if (selectedCategory && selectedCategory !== "all" && product.categoryId !== selectedCategory) {
+      return false;
+    }
+    
+    // Stock filter
+    if (stockFilter === "in-stock" && product.stock <= 0) return false;
+    if (stockFilter === "low-stock" && product.stock > product.minStock) return false;
+    if (stockFilter === "out-of-stock" && product.stock > 0) return false;
+    
+    return true;
+  });
+
+  const products = filteredProducts;
 
   // Fetch categories
   const { data: categories = [] } = useQuery<ProductCategory[]>({
@@ -151,12 +184,18 @@ export default function Products() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Product Management</h1>
-          <p className="text-muted-foreground">Manage your bakery products, inventory, and pricing</p>
+          <p className="text-muted-foreground">
+            {canManageProducts 
+              ? "Manage your bakery products, inventory, and pricing" 
+              : "Browse bakery products and check availability"}
+          </p>
         </div>
-        <Button onClick={() => setIsCreateDialogOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Add Product
-        </Button>
+        {canCreateProducts && (
+          <Button onClick={() => setIsCreateDialogOpen(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Product
+          </Button>
+        )}
       </div>
 
       {/* Low Stock Alert */}
@@ -221,7 +260,27 @@ export default function Products() {
                 </SelectContent>
               </Select>
             </div>
+            {!canManageProducts && (
+              <div className="w-full md:w-48">
+                <Select value={stockFilter} onValueChange={setStockFilter}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Stock Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Products</SelectItem>
+                    <SelectItem value="in-stock">In Stock</SelectItem>
+                    <SelectItem value="low-stock">Low Stock</SelectItem>
+                    <SelectItem value="out-of-stock">Out of Stock</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </div>
+          {!canManageProducts && (
+            <div className="mt-4 text-sm text-muted-foreground">
+              Showing {products.length} of {allProducts.length} products
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -275,23 +334,27 @@ export default function Products() {
                         >
                           <Eye className="w-4 h-4" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setEditingProduct(product);
-                            setIsEditDialogOpen(true);
-                          }}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteMutation.mutate(product.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        {canManageProducts && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setEditingProduct(product);
+                              setIsEditDialogOpen(true);
+                            }}
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                        )}
+                        {canDeleteProducts && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => deleteMutation.mutate(product.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
                       </div>
                     </div>
                     <p className="text-sm text-muted-foreground line-clamp-2">
