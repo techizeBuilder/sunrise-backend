@@ -85,9 +85,9 @@ export default function Contact() {
                   <div>
                     <h3 className="font-semibold text-foreground mb-1">Address</h3>
                     <p className="text-muted-foreground">
-                      123 Artisan Street<br />
-                      Downtown District<br />
-                      San Francisco, CA 94102
+                      Plot#75, Road# 9, IDA<br />
+                      Mallapur, Telangana - 500076<br />
+                      Hyderabad
                     </p>
                   </div>
                 </div>
@@ -98,7 +98,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground mb-1">Phone</h3>
-                    <p className="text-muted-foreground">(415) 555-BREAD</p>
+                    <p className="text-muted-foreground">+91 98490 08282</p>
                   </div>
                 </div>
                 
@@ -108,7 +108,7 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground mb-1">Email</h3>
-                    <p className="text-muted-foreground">hello@goldencrust.com</p>
+                    <p className="text-muted-foreground">orders@sunrisefoods</p>
                   </div>
                 </div>
                 
@@ -119,9 +119,8 @@ export default function Contact() {
                   <div>
                     <h3 className="font-semibold text-foreground mb-1">Hours</h3>
                     <div className="text-muted-foreground space-y-1">
-                      <p>Monday - Friday: 6:00 AM - 7:00 PM</p>
-                      <p>Saturday: 6:00 AM - 8:00 PM</p>
-                      <p>Sunday: 7:00 AM - 6:00 PM</p>
+                      <p>Monday - Saturday: 8:00 AM - 7:00 PM</p>
+                      <p>Sunday: Closed</p>
                     </div>
                   </div>
                 </div>

@@ -54,19 +54,18 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Contact Info</h4>
             <ul className="space-y-2 text-gray-300">
-              <li>123 Artisan Street</li>
-              <li>San Francisco, CA 94102</li>
-              <li>(415) 555-BREAD</li>
-              <li>hello@goldencrust.com</li>
+              <li>Plot#75, Road# 9, IDA</li>
+              <li>Mallapur, Telangana - 500076</li>
+              <li>+91 98490 08282</li>
+              <li>orders@sunrisefoods</li>
             </ul>
           </div>
           
           <div>
             <h4 className="font-semibold mb-4">Hours</h4>
             <ul className="space-y-2 text-gray-300">
-              <li>Mon-Fri: 6AM - 7PM</li>
-              <li>Saturday: 6AM - 8PM</li>
-              <li>Sunday: 7AM - 6PM</li>
+              <li>Mon-Sat: 8AM - 7PM</li>
+              <li>Sunday: Closed</li>
             </ul>
           </div>
         </div>
