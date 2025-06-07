@@ -305,6 +305,7 @@ export default function Products() {
           ))
         ) : (
           products.map((product: Product) => {
+            if (!product || !product.id) return null;
             const stockStatus = getStockStatus(product);
             return (
               <Card key={product.id} className="overflow-hidden">

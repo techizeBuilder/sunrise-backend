@@ -70,16 +70,6 @@ export default function ManagementLayout({ children }: ManagementLayoutProps) {
             </div>
             
             <div className="flex items-center space-x-4">
-              {user && (
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-600">
-                    {(user as any).firstName} {(user as any).lastName}
-                  </span>
-                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                    {(user as any).role}
-                  </span>
-                </div>
-              )}
               <Link href="/profile">
                 <Button variant="ghost" size="sm">
                   <User className="w-4 h-4" />
