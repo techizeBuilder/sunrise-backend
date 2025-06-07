@@ -9,6 +9,7 @@ import Footer from "@/components/layout/footer";
 import Home from "@/pages/home";
 import About from "@/pages/about";
 import Products from "@/pages/products";
+import CustomerProducts from "@/pages/customer-products";
 import Categories from "@/pages/categories";
 import ProductHub from "@/pages/product-hub";
 import PriceLists from "@/pages/price-lists";
@@ -54,7 +55,7 @@ function Router() {
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/about" component={About} />
-          <Route path="/products" component={Products} />
+          <Route path="/products" component={CustomerProducts} />
           <Route path="/gallery" component={Gallery} />
           <Route path="/contact" component={Contact} />
           <Route component={NotFound} />
