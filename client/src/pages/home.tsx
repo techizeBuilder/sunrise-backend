@@ -219,7 +219,7 @@ export default function Home() {
       </section>
 
       {/* About Us Section */}
-      <section className="section-padding bg-background">
+      <section id="about" className="section-padding bg-background">
         <div className="container-max">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>

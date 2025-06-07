@@ -6,11 +6,27 @@ import { Menu } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
   { href: "/products", label: "Products" },
   { href: "/gallery", label: "Gallery" },
   { href: "/contact", label: "Contact" },
 ];
+
+const scrollToAbout = () => {
+  const aboutSection = document.getElementById('about');
+  if (aboutSection) {
+    // If on home page, scroll to about section
+    aboutSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    // If not on home page, navigate to home first
+    window.location.href = '/';
+    setTimeout(() => {
+      const section = document.getElementById('about');
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  }
+};
 
 export default function Navbar() {
   const [location] = useLocation();
@@ -46,6 +62,12 @@ export default function Navbar() {
                   {item.label}
                 </Link>
               ))}
+              <button
+                onClick={scrollToAbout}
+                className="nav-link px-3 py-2 text-foreground hover:text-primary transition-colors"
+              >
+                About
+              </button>
               <Link href="/login">
                 <Button className="btn-primary">
                   Admin
@@ -78,6 +100,15 @@ export default function Navbar() {
                       {item.label}
                     </Link>
                   ))}
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      scrollToAbout();
+                    }}
+                    className="block px-3 py-2 text-lg text-foreground hover:text-primary transition-colors text-left"
+                  >
+                    About
+                  </button>
                   <Link href="/admin" onClick={() => setIsOpen(false)}>
                     <Button className="btn-primary w-full">
                       Admin
