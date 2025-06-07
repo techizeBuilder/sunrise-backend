@@ -606,7 +606,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/discounts", requireAuth, requireRole(['admin', 'sales']), async (req, res) => {
     try {
-      const discountData = discountSchema.parse(req.body);
+      // Convert date strings to Date objects
+      const requestBody = {
+        ...req.body,
+        validFrom: req.body.validFrom ? new Date(req.body.validFrom) : undefined,
+        validTo: req.body.validTo ? new Date(req.body.validTo) : undefined,
+      };
+      
+      const discountData = discountSchema.parse(requestBody);
       const discount = await storage.createDiscount(discountData);
       res.status(201).json(discount);
     } catch (error) {
