@@ -333,7 +333,7 @@ export class MongoStorage implements IStorage {
       {
         name: "Classic Sourdough",
         description: "Traditional sourdough with perfect crust and tangy flavor",
-        price: "$8.50",
+        price: "₹85",
         category: "breads",
         imageUrl: "https://images.unsplash.com/photo-1549931319-a545dcf3bc73?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         isActive: true,
@@ -342,7 +342,7 @@ export class MongoStorage implements IStorage {
       {
         name: "Multigrain Harvest",
         description: "Hearty blend of whole grains, seeds, and nuts",
-        price: "$9.25",
+        price: "₹92",
         category: "breads",
         imageUrl: "https://images.unsplash.com/photo-1586444248902-2f64eddc13df?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         isActive: true,
@@ -351,7 +351,7 @@ export class MongoStorage implements IStorage {
       {
         name: "Butter Croissant",
         description: "Flaky, buttery layers of perfection",
-        price: "$3.75",
+        price: "₹38",
         category: "pastries",
         imageUrl: "https://images.unsplash.com/photo-1555507036-ab794f27d96e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         isActive: true,
@@ -360,7 +360,7 @@ export class MongoStorage implements IStorage {
       {
         name: "Pain au Chocolat",
         description: "Buttery, flaky pastry filled with premium Belgian dark chocolate",
-        price: "$4.75",
+        price: "₹48",
         category: "pastries",
         imageUrl: "https://images.unsplash.com/photo-1551024506-0bccd828d307?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         isActive: true,
@@ -369,7 +369,7 @@ export class MongoStorage implements IStorage {
       {
         name: "French Macarons",
         description: "Delicate almond cookies with ganache filling in various flavors",
-        price: "$3.25 each",
+        price: "₹32 each",
         category: "desserts",
         imageUrl: "https://images.unsplash.com/photo-1569864358642-9d1684040f43?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         isActive: true,
@@ -378,7 +378,7 @@ export class MongoStorage implements IStorage {
       {
         name: "Chocolate Éclair",
         description: "Classic choux pastry filled with vanilla cream and chocolate glaze",
-        price: "$4.25",
+        price: "₹42",
         category: "desserts",
         imageUrl: "https://images.unsplash.com/photo-1486427944299-d1955d23e34d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         isActive: true,
@@ -387,7 +387,7 @@ export class MongoStorage implements IStorage {
       {
         name: "Chocolate Layer Cake",
         description: "Rich chocolate cake with layers of buttercream frosting",
-        price: "$45.00",
+        price: "₹450",
         category: "cakes",
         imageUrl: "https://images.unsplash.com/photo-1578775887804-699de7086ff9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         isActive: true,
@@ -396,7 +396,7 @@ export class MongoStorage implements IStorage {
       {
         name: "Red Velvet Cake",
         description: "Classic red velvet with cream cheese frosting",
-        price: "$48.00",
+        price: "₹480",
         category: "cakes",
         imageUrl: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         isActive: true,
