@@ -1,75 +1,193 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const products = pgTable("products", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  description: text("description").notNull(),
-  price: text("price").notNull(),
-  category: text("category").notNull(),
-  imageUrl: text("image_url").notNull(),
-  isActive: boolean("is_active").default(true),
-  createdAt: timestamp("created_at").defaultNow(),
+// User Roles
+export type UserRole = "admin" | "sales" | "production" | "inventory" | "accounts" | "distributor";
+
+// User Management
+export interface User {
+  _id?: string;
+  id: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+  isActive: boolean;
+  lastLogin?: Date;
+  resetToken?: string;
+  resetTokenExpiry?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UserSession {
+  userId: string;
+  role: UserRole;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
+// Products
+export interface Product {
+  _id?: string;
+  id: string;
+  name: string;
+  description: string;
+  price: string;
+  category: string;
+  sku: string;
+  stock: number;
+  minStock: number;
+  imageUrl: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Orders
+export interface Order {
+  _id?: string;
+  id: string;
+  orderNumber: string;
+  customerId: string;
+  customerName: string;
+  customerEmail: string;
+  items: OrderItem[];
+  totalAmount: number;
+  status: "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+  orderDate: Date;
+  deliveryDate?: Date;
+  distributorId?: string;
+  notes?: string;
+}
+
+export interface OrderItem {
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+}
+
+// Production
+export interface ProductionBatch {
+  _id?: string;
+  id: string;
+  batchNumber: string;
+  productId: string;
+  productName: string;
+  quantity: number;
+  status: "planned" | "in-progress" | "completed" | "cancelled";
+  startDate: Date;
+  expectedEndDate: Date;
+  actualEndDate?: Date;
+  supervisorId: string;
+  notes?: string;
+}
+
+// Inventory
+export interface InventoryMovement {
+  _id?: string;
+  id: string;
+  productId: string;
+  type: "in" | "out" | "adjustment";
+  quantity: number;
+  reason: string;
+  userId: string;
+  date: Date;
+  batchNumber?: string;
+}
+
+// Financial Records
+export interface FinancialRecord {
+  _id?: string;
+  id: string;
+  type: "income" | "expense";
+  category: string;
+  amount: number;
+  description: string;
+  date: Date;
+  userId: string;
+  orderId?: string;
+  approved: boolean;
+  approvedBy?: string;
+}
+
+// Distributors
+export interface Distributor {
+  _id?: string;
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  isActive: boolean;
+  userId?: string;
+  createdAt: Date;
+}
+
+// Zod Schemas for validation
+export const userSchema = z.object({
+  email: z.string().email("Invalid email format"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  role: z.enum(["admin", "sales", "production", "inventory", "accounts", "distributor"]),
+  isActive: z.boolean().default(true),
 });
 
-export const galleryImages = pgTable("gallery_images", {
-  id: serial("id").primaryKey(),
-  title: text("title").notNull(),
-  imageUrl: text("image_url").notNull(),
-  altText: text("alt_text").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+export const loginSchema = z.object({
+  email: z.string().email("Invalid email format"),
+  password: z.string().min(1, "Password is required"),
 });
 
-export const contactMessages = pgTable("contact_messages", {
-  id: serial("id").primaryKey(),
-  firstName: text("first_name").notNull(),
-  lastName: text("last_name").notNull(),
-  email: text("email").notNull(),
-  subject: text("subject").notNull(),
-  message: text("message").notNull(),
-  isRead: boolean("is_read").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
+export const resetPasswordSchema = z.object({
+  email: z.string().email("Invalid email format"),
 });
 
-export const adminUsers = pgTable("admin_users", {
-  id: serial("id").primaryKey(),
-  email: text("email").notNull().unique(),
-  password: text("password").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+export const updatePasswordSchema = z.object({
+  token: z.string().min(1, "Reset token is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-// Insert schemas
-export const insertProductSchema = createInsertSchema(products).omit({
-  id: true,
-  createdAt: true,
+export const updateProfileSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Invalid email format"),
 });
 
-export const insertGalleryImageSchema = createInsertSchema(galleryImages).omit({
-  id: true,
-  createdAt: true,
+export const productSchema = z.object({
+  name: z.string().min(1, "Product name is required"),
+  description: z.string().min(1, "Description is required"),
+  price: z.string().min(1, "Price is required"),
+  category: z.string().min(1, "Category is required"),
+  sku: z.string().min(1, "SKU is required"),
+  stock: z.number().min(0, "Stock cannot be negative"),
+  minStock: z.number().min(0, "Minimum stock cannot be negative"),
+  imageUrl: z.string().url("Invalid image URL"),
+  isActive: z.boolean().default(true),
 });
 
-export const insertContactMessageSchema = createInsertSchema(contactMessages).omit({
-  id: true,
-  isRead: true,
-  createdAt: true,
+export const orderSchema = z.object({
+  customerName: z.string().min(1, "Customer name is required"),
+  customerEmail: z.string().email("Invalid email format"),
+  items: z.array(z.object({
+    productId: z.string().min(1, "Product ID is required"),
+    quantity: z.number().min(1, "Quantity must be at least 1"),
+  })).min(1, "At least one item is required"),
+  distributorId: z.string().optional(),
+  notes: z.string().optional(),
 });
 
-export const insertAdminUserSchema = createInsertSchema(adminUsers).omit({
-  id: true,
-  createdAt: true,
-});
-
-// Types
-export type Product = typeof products.$inferSelect;
-export type InsertProduct = z.infer<typeof insertProductSchema>;
-
-export type GalleryImage = typeof galleryImages.$inferSelect;
-export type InsertGalleryImage = z.infer<typeof insertGalleryImageSchema>;
-
-export type ContactMessage = typeof contactMessages.$inferSelect;
-export type InsertContactMessage = z.infer<typeof insertContactMessageSchema>;
-
-export type AdminUser = typeof adminUsers.$inferSelect;
-export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;
+// Types for components
+export type InsertUser = z.infer<typeof userSchema>;
+export type LoginData = z.infer<typeof loginSchema>;
+export type ResetPasswordData = z.infer<typeof resetPasswordSchema>;
+export type UpdatePasswordData = z.infer<typeof updatePasswordSchema>;
+export type UpdateProfileData = z.infer<typeof updateProfileSchema>;
+export type InsertProduct = z.infer<typeof productSchema>;
+export type InsertOrder = z.infer<typeof orderSchema>;

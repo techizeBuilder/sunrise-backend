@@ -1,312 +1,80 @@
 import {
-  products,
-  galleryImages,
-  contactMessages,
-  adminUsers,
+  type User,
+  type UserSession,
+  type UserRole,
   type Product,
+  type Order,
+  type ProductionBatch,
+  type InventoryMovement,
+  type FinancialRecord,
+  type Distributor,
+  type InsertUser,
   type InsertProduct,
-  type GalleryImage,
-  type InsertGalleryImage,
-  type ContactMessage,
-  type InsertContactMessage,
-  type AdminUser,
-  type InsertAdminUser,
+  type InsertOrder,
 } from "@shared/schema";
 import { connectToDatabase } from "./db";
 import { ObjectId } from "mongodb";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 export interface IStorage {
+  // User operations
+  getUserById(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+  updateUser(id: string, updates: Partial<User>): Promise<User | undefined>;
+  deleteUser(id: string): Promise<boolean>;
+  getAllUsers(): Promise<User[]>;
+  updateUserPassword(id: string, hashedPassword: string): Promise<boolean>;
+  setResetToken(email: string, token: string, expiry: Date): Promise<boolean>;
+  getUserByResetToken(token: string): Promise<User | undefined>;
+  clearResetToken(id: string): Promise<boolean>;
+
   // Product operations
   getProducts(): Promise<Product[]>;
-  getProductsByCategory(category: string): Promise<Product[]>;
-  getProduct(id: number): Promise<Product | undefined>;
+  getProduct(id: string): Promise<Product | undefined>;
   createProduct(product: InsertProduct): Promise<Product>;
-  updateProduct(id: number, product: Partial<InsertProduct>): Promise<Product | undefined>;
-  deleteProduct(id: number): Promise<boolean>;
+  updateProduct(id: string, product: Partial<Product>): Promise<Product | undefined>;
+  deleteProduct(id: string): Promise<boolean>;
+  updateProductStock(id: string, quantity: number): Promise<boolean>;
+  getLowStockProducts(): Promise<Product[]>;
 
-  // Gallery operations
-  getGalleryImages(): Promise<GalleryImage[]>;
-  getGalleryImage(id: number): Promise<GalleryImage | undefined>;
-  createGalleryImage(image: InsertGalleryImage): Promise<GalleryImage>;
-  deleteGalleryImage(id: number): Promise<boolean>;
+  // Order operations
+  getOrders(): Promise<Order[]>;
+  getOrdersByUserId(userId: string): Promise<Order[]>;
+  getOrder(id: string): Promise<Order | undefined>;
+  createOrder(order: InsertOrder, userId: string): Promise<Order>;
+  updateOrderStatus(id: string, status: string): Promise<boolean>;
+  getOrdersByDateRange(startDate: Date, endDate: Date): Promise<Order[]>;
 
-  // Contact message operations
-  getContactMessages(): Promise<ContactMessage[]>;
-  getContactMessage(id: number): Promise<ContactMessage | undefined>;
-  createContactMessage(message: InsertContactMessage): Promise<ContactMessage>;
-  markMessageAsRead(id: number): Promise<boolean>;
-  deleteContactMessage(id: number): Promise<boolean>;
+  // Production operations
+  getProductionBatches(): Promise<ProductionBatch[]>;
+  getProductionBatch(id: string): Promise<ProductionBatch | undefined>;
+  createProductionBatch(batch: Partial<ProductionBatch>): Promise<ProductionBatch>;
+  updateProductionBatchStatus(id: string, status: string): Promise<boolean>;
+  getProductionBatchesByStatus(status: string): Promise<ProductionBatch[]>;
 
-  // Admin operations
-  getAdminByEmail(email: string): Promise<AdminUser | undefined>;
-  createAdmin(admin: InsertAdminUser): Promise<AdminUser>;
+  // Inventory operations
+  getInventoryMovements(): Promise<InventoryMovement[]>;
+  createInventoryMovement(movement: Partial<InventoryMovement>): Promise<InventoryMovement>;
+  getInventoryMovementsByProduct(productId: string): Promise<InventoryMovement[]>;
+  getInventoryMovementsByDateRange(startDate: Date, endDate: Date): Promise<InventoryMovement[]>;
+
+  // Financial operations
+  getFinancialRecords(): Promise<FinancialRecord[]>;
+  createFinancialRecord(record: Partial<FinancialRecord>): Promise<FinancialRecord>;
+  updateFinancialRecordApproval(id: string, approved: boolean, approvedBy: string): Promise<boolean>;
+  getFinancialRecordsByDateRange(startDate: Date, endDate: Date): Promise<FinancialRecord[]>;
+  getFinancialSummary(startDate: Date, endDate: Date): Promise<{income: number, expense: number}>;
+
+  // Distributor operations
+  getDistributors(): Promise<Distributor[]>;
+  getDistributor(id: string): Promise<Distributor | undefined>;
+  createDistributor(distributor: Partial<Distributor>): Promise<Distributor>;
+  updateDistributor(id: string, updates: Partial<Distributor>): Promise<Distributor | undefined>;
+  getDistributorByUserId(userId: string): Promise<Distributor | undefined>;
 }
 
-export class MemStorage implements IStorage {
-  private products: Map<number, Product>;
-  private galleryImages: Map<number, GalleryImage>;
-  private contactMessages: Map<number, ContactMessage>;
-  private adminUsers: Map<number, AdminUser>;
-  private currentProductId: number;
-  private currentGalleryId: number;
-  private currentMessageId: number;
-  private currentAdminId: number;
-
-  constructor() {
-    this.products = new Map();
-    this.galleryImages = new Map();
-    this.contactMessages = new Map();
-    this.adminUsers = new Map();
-    this.currentProductId = 1;
-    this.currentGalleryId = 1;
-    this.currentMessageId = 1;
-    this.currentAdminId = 1;
-
-    // Initialize with sample data
-    this.initializeData();
-  }
-
-  private initializeData() {
-    // Sample products
-    const sampleProducts: InsertProduct[] = [
-      {
-        name: "Classic Sourdough",
-        description: "Traditional sourdough with perfect crust and tangy flavor",
-        price: "₹85",
-        category: "breads",
-        imageUrl: "https://images.unsplash.com/photo-1549931319-a545dcf3bc73?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        isActive: true,
-      },
-      {
-        name: "Multigrain Harvest",
-        description: "Hearty blend of whole grains, seeds, and nuts",
-        price: "₹92",
-        category: "breads",
-        imageUrl: "https://images.unsplash.com/photo-1586444248902-2f64eddc13df?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        isActive: true,
-      },
-      {
-        name: "Butter Croissant",
-        description: "Flaky, buttery layers of perfection",
-        price: "₹38",
-        category: "pastries",
-        imageUrl: "https://images.unsplash.com/photo-1555507036-ab794f27d96e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        isActive: true,
-      },
-      {
-        name: "Pain au Chocolat",
-        description: "Buttery, flaky pastry filled with premium Belgian dark chocolate",
-        price: "₹48",
-        category: "pastries",
-        imageUrl: "https://images.unsplash.com/photo-1551024506-0bccd828d307?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        isActive: true,
-      },
-      {
-        name: "French Macarons",
-        description: "Delicate almond cookies with ganache filling in various flavors",
-        price: "₹32 each",
-        category: "desserts",
-        imageUrl: "https://images.unsplash.com/photo-1569864358642-9d1684040f43?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        isActive: true,
-      },
-      {
-        name: "Chocolate Éclair",
-        description: "Classic choux pastry filled with vanilla cream and chocolate glaze",
-        price: "₹42",
-        category: "desserts",
-        imageUrl: "https://images.unsplash.com/photo-1486427944299-d1955d23e34d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        isActive: true,
-      },
-      {
-        name: "Chocolate Layer Cake",
-        description: "Rich chocolate cake with layers of buttercream frosting",
-        price: "₹450",
-        category: "cakes",
-        imageUrl: "https://images.unsplash.com/photo-1578775887804-699de7086ff9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        isActive: true,
-      },
-      {
-        name: "Red Velvet Cake",
-        description: "Classic red velvet with cream cheese frosting",
-        price: "₹480",
-        category: "cakes",
-        imageUrl: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        isActive: true,
-      },
-    ];
-
-    sampleProducts.forEach(product => {
-      this.createProduct(product);
-    });
-
-    // Sample gallery images
-    const sampleGalleryImages: InsertGalleryImage[] = [
-      {
-        title: "Baker at Work",
-        imageUrl: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        altText: "Baker kneading dough in traditional kitchen",
-      },
-      {
-        title: "Fresh Bread Display",
-        imageUrl: "https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        altText: "Fresh bread display in bakery window",
-      },
-      {
-        title: "Artisan Pastries",
-        imageUrl: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        altText: "Artisanal pastries on wooden boards",
-      },
-      {
-        title: "Traditional Oven",
-        imageUrl: "https://images.unsplash.com/photo-1586985564150-0bf4e4d8b84a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        altText: "Traditional brick oven with flames",
-      },
-      {
-        title: "Wedding Cake",
-        imageUrl: "https://images.unsplash.com/photo-1578775887804-699de7086ff9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        altText: "Wedding cake decorating process",
-      },
-      {
-        title: "Macaron Collection",
-        imageUrl: "https://images.unsplash.com/photo-1569864358642-9d1684040f43?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        altText: "Colorful macaron tower",
-      },
-    ];
-
-    sampleGalleryImages.forEach(image => {
-      this.createGalleryImage(image);
-    });
-
-    // Create default admin user
-    this.createAdmin({
-      email: "admin@goldencrust.com",
-      password: "admin123", // In production, this should be hashed
-    });
-  }
-
-  // Product operations
-  async getProducts(): Promise<Product[]> {
-    return Array.from(this.products.values()).filter(p => p.isActive);
-  }
-
-  async getProductsByCategory(category: string): Promise<Product[]> {
-    return Array.from(this.products.values()).filter(p => p.category === category && p.isActive);
-  }
-
-  async getProduct(id: number): Promise<Product | undefined> {
-    return this.products.get(id);
-  }
-
-  async createProduct(productData: InsertProduct): Promise<Product> {
-    const id = this.currentProductId++;
-    const product: Product = {
-      id,
-      name: productData.name,
-      description: productData.description,
-      price: productData.price,
-      category: productData.category,
-      imageUrl: productData.imageUrl,
-      isActive: productData.isActive ?? true,
-      createdAt: new Date(),
-    };
-    this.products.set(id, product);
-    return product;
-  }
-
-  async updateProduct(id: number, productData: Partial<InsertProduct>): Promise<Product | undefined> {
-    const existingProduct = this.products.get(id);
-    if (!existingProduct) return undefined;
-
-    const updatedProduct: Product = {
-      ...existingProduct,
-      ...productData,
-    };
-    this.products.set(id, updatedProduct);
-    return updatedProduct;
-  }
-
-  async deleteProduct(id: number): Promise<boolean> {
-    return this.products.delete(id);
-  }
-
-  // Gallery operations
-  async getGalleryImages(): Promise<GalleryImage[]> {
-    return Array.from(this.galleryImages.values());
-  }
-
-  async getGalleryImage(id: number): Promise<GalleryImage | undefined> {
-    return this.galleryImages.get(id);
-  }
-
-  async createGalleryImage(imageData: InsertGalleryImage): Promise<GalleryImage> {
-    const id = this.currentGalleryId++;
-    const image: GalleryImage = {
-      ...imageData,
-      id,
-      createdAt: new Date(),
-    };
-    this.galleryImages.set(id, image);
-    return image;
-  }
-
-  async deleteGalleryImage(id: number): Promise<boolean> {
-    return this.galleryImages.delete(id);
-  }
-
-  // Contact message operations
-  async getContactMessages(): Promise<ContactMessage[]> {
-    return Array.from(this.contactMessages.values()).sort((a, b) => 
-      new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()
-    );
-  }
-
-  async getContactMessage(id: number): Promise<ContactMessage | undefined> {
-    return this.contactMessages.get(id);
-  }
-
-  async createContactMessage(messageData: InsertContactMessage): Promise<ContactMessage> {
-    const id = this.currentMessageId++;
-    const message: ContactMessage = {
-      ...messageData,
-      id,
-      isRead: false,
-      createdAt: new Date(),
-    };
-    this.contactMessages.set(id, message);
-    return message;
-  }
-
-  async markMessageAsRead(id: number): Promise<boolean> {
-    const message = this.contactMessages.get(id);
-    if (!message) return false;
-
-    const updatedMessage = { ...message, isRead: true };
-    this.contactMessages.set(id, updatedMessage);
-    return true;
-  }
-
-  async deleteContactMessage(id: number): Promise<boolean> {
-    return this.contactMessages.delete(id);
-  }
-
-  // Admin operations
-  async getAdminByEmail(email: string): Promise<AdminUser | undefined> {
-    return Array.from(this.adminUsers.values()).find(admin => admin.email === email);
-  }
-
-  async createAdmin(adminData: InsertAdminUser): Promise<AdminUser> {
-    const id = this.currentAdminId++;
-    const admin: AdminUser = {
-      ...adminData,
-      id,
-      createdAt: new Date(),
-    };
-    this.adminUsers.set(id, admin);
-    return admin;
-  }
-}
-
-// MongoDB Storage Implementation
 export class MongoStorage implements IStorage {
   private db: any;
 
@@ -324,291 +92,463 @@ export class MongoStorage implements IStorage {
   }
 
   private async createSampleData() {
-    // Check if data already exists
-    const existingProducts = await this.db.collection('products').countDocuments();
-    if (existingProducts > 0) return;
+    // Check if admin user already exists
+    const existingAdmin = await this.db.collection('users').findOne({ email: 'admin@sunrisefoods.in' });
+    if (existingAdmin) return;
 
-    // Sample products
+    // Create default admin user
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    await this.createUser({
+      email: 'admin@sunrisefoods.in',
+      password: hashedPassword,
+      firstName: 'Admin',
+      lastName: 'User',
+      role: 'admin',
+      isActive: true,
+    });
+
+    // Create sample users for different roles
+    const sampleUsers = [
+      { email: 'sales@sunrisefoods.in', role: 'sales', firstName: 'Sales', lastName: 'Manager' },
+      { email: 'production@sunrisefoods.in', role: 'production', firstName: 'Production', lastName: 'Head' },
+      { email: 'inventory@sunrisefoods.in', role: 'inventory', firstName: 'Inventory', lastName: 'Manager' },
+      { email: 'accounts@sunrisefoods.in', role: 'accounts', firstName: 'Accounts', lastName: 'Manager' },
+      { email: 'distributor@sunrisefoods.in', role: 'distributor', firstName: 'Distributor', lastName: 'Partner' },
+    ];
+
+    for (const userData of sampleUsers) {
+      await this.createUser({
+        ...userData,
+        password: hashedPassword,
+        isActive: true,
+      } as InsertUser);
+    }
+
+    // Create sample products
     const sampleProducts = [
       {
         name: "Classic Sourdough",
         description: "Traditional sourdough with perfect crust and tangy flavor",
         price: "₹85",
         category: "breads",
+        sku: "BR001",
+        stock: 50,
+        minStock: 10,
         imageUrl: "https://images.unsplash.com/photo-1549931319-a545dcf3bc73?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         isActive: true,
-        createdAt: new Date(),
       },
       {
         name: "Multigrain Harvest",
         description: "Hearty blend of whole grains, seeds, and nuts",
         price: "₹92",
         category: "breads",
+        sku: "BR002",
+        stock: 30,
+        minStock: 8,
         imageUrl: "https://images.unsplash.com/photo-1586444248902-2f64eddc13df?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         isActive: true,
-        createdAt: new Date(),
-      },
-      {
-        name: "Butter Croissant",
-        description: "Flaky, buttery layers of perfection",
-        price: "₹38",
-        category: "pastries",
-        imageUrl: "https://images.unsplash.com/photo-1555507036-ab794f27d96e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        isActive: true,
-        createdAt: new Date(),
-      },
-      {
-        name: "Pain au Chocolat",
-        description: "Buttery, flaky pastry filled with premium Belgian dark chocolate",
-        price: "₹48",
-        category: "pastries",
-        imageUrl: "https://images.unsplash.com/photo-1551024506-0bccd828d307?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        isActive: true,
-        createdAt: new Date(),
-      },
-      {
-        name: "French Macarons",
-        description: "Delicate almond cookies with ganache filling in various flavors",
-        price: "₹32 each",
-        category: "desserts",
-        imageUrl: "https://images.unsplash.com/photo-1569864358642-9d1684040f43?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        isActive: true,
-        createdAt: new Date(),
-      },
-      {
-        name: "Chocolate Éclair",
-        description: "Classic choux pastry filled with vanilla cream and chocolate glaze",
-        price: "₹42",
-        category: "desserts",
-        imageUrl: "https://images.unsplash.com/photo-1486427944299-d1955d23e34d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        isActive: true,
-        createdAt: new Date(),
       },
       {
         name: "Chocolate Layer Cake",
         description: "Rich chocolate cake with layers of buttercream frosting",
         price: "₹450",
         category: "cakes",
+        sku: "CK001",
+        stock: 15,
+        minStock: 5,
         imageUrl: "https://images.unsplash.com/photo-1578775887804-699de7086ff9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
         isActive: true,
-        createdAt: new Date(),
-      },
-      {
-        name: "Red Velvet Cake",
-        description: "Classic red velvet with cream cheese frosting",
-        price: "₹480",
-        category: "cakes",
-        imageUrl: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        isActive: true,
-        createdAt: new Date(),
       },
     ];
 
-    // Sample gallery images
-    const sampleGalleryImages = [
-      {
-        title: "Baker at Work",
-        imageUrl: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        altText: "Baker kneading dough in traditional kitchen",
-        createdAt: new Date(),
-      },
-      {
-        title: "Fresh Bread Display",
-        imageUrl: "https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        altText: "Fresh bread display in bakery window",
-        createdAt: new Date(),
-      },
-      {
-        title: "Artisan Pastries",
-        imageUrl: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        altText: "Artisanal pastries on wooden boards",
-        createdAt: new Date(),
-      },
-      {
-        title: "Traditional Oven",
-        imageUrl: "https://images.unsplash.com/photo-1586985564150-0bf4e4d8b84a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        altText: "Traditional brick oven with flames",
-        createdAt: new Date(),
-      },
-      {
-        title: "Wedding Cake",
-        imageUrl: "https://images.unsplash.com/photo-1578775887804-699de7086ff9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        altText: "Wedding cake decorating process",
-        createdAt: new Date(),
-      },
-      {
-        title: "Macaron Collection",
-        imageUrl: "https://images.unsplash.com/photo-1569864358642-9d1684040f43?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-        altText: "Colorful macaron tower",
-        createdAt: new Date(),
-      },
-    ];
-
-    // Insert sample data
-    await this.db.collection('products').insertMany(sampleProducts);
-    await this.db.collection('gallery_images').insertMany(sampleGalleryImages);
-    
-    // Create default admin user
-    await this.db.collection('admin_users').insertOne({
-      email: "admin@goldencrust.com",
-      password: "admin123",
-      createdAt: new Date(),
-    });
-
-    console.log("Sample data created in MongoDB");
-  }
-
-  // Product operations
-  async getProducts(): Promise<Product[]> {
-    if (!this.db) await this.initializeDatabase();
-    const products = await this.db.collection('products').find({ isActive: true }).toArray();
-    return products.map(this.transformMongoDoc);
-  }
-
-  async getProductsByCategory(category: string): Promise<Product[]> {
-    if (!this.db) await this.initializeDatabase();
-    const products = await this.db.collection('products').find({ 
-      category, 
-      isActive: true 
-    }).toArray();
-    return products.map(this.transformMongoDoc);
-  }
-
-  async getProduct(id: number): Promise<Product | undefined> {
-    if (!this.db) await this.initializeDatabase();
-    try {
-      const product = await this.db.collection('products').findOne({ _id: new ObjectId(id.toString()) });
-      return product ? this.transformMongoDoc(product) : undefined;
-    } catch (error) {
-      return undefined;
+    for (const product of sampleProducts) {
+      await this.createProduct(product);
     }
   }
 
-  async createProduct(productData: InsertProduct): Promise<Product> {
-    if (!this.db) await this.initializeDatabase();
-    const result = await this.db.collection('products').insertOne({
-      ...productData,
-      isActive: productData.isActive ?? true,
-      createdAt: new Date(),
-    });
-    
-    const product = await this.db.collection('products').findOne({ _id: result.insertedId });
-    return this.transformMongoDoc(product);
+  // User operations
+  async getUserById(id: string): Promise<User | undefined> {
+    const user = await this.db.collection('users').findOne({ id });
+    return user ? this.transformMongoDoc(user) : undefined;
   }
 
-  async updateProduct(id: number, productData: Partial<InsertProduct>): Promise<Product | undefined> {
-    if (!this.db) await this.initializeDatabase();
-    await this.db.collection('products').updateOne(
-      { _id: new ObjectId(id.toString()) },
-      { $set: productData }
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const user = await this.db.collection('users').findOne({ email });
+    return user ? this.transformMongoDoc(user) : undefined;
+  }
+
+  async createUser(userData: InsertUser): Promise<User> {
+    const id = new ObjectId().toString();
+    const user = {
+      id,
+      ...userData,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    await this.db.collection('users').insertOne(user);
+    return this.transformMongoDoc(user);
+  }
+
+  async updateUser(id: string, updates: Partial<User>): Promise<User | undefined> {
+    const result = await this.db.collection('users').findOneAndUpdate(
+      { id },
+      { $set: { ...updates, updatedAt: new Date() } },
+      { returnDocument: 'after' }
     );
-    
-    const product = await this.db.collection('products').findOne({ _id: new ObjectId(id.toString()) });
-    return product ? this.transformMongoDoc(product) : undefined;
+    return result ? this.transformMongoDoc(result) : undefined;
   }
 
-  async deleteProduct(id: number): Promise<boolean> {
-    if (!this.db) await this.initializeDatabase();
-    const result = await this.db.collection('products').deleteOne({ _id: new ObjectId(id.toString()) });
+  async deleteUser(id: string): Promise<boolean> {
+    const result = await this.db.collection('users').deleteOne({ id });
     return result.deletedCount > 0;
   }
 
-  // Gallery operations
-  async getGalleryImages(): Promise<GalleryImage[]> {
-    if (!this.db) await this.initializeDatabase();
-    const images = await this.db.collection('gallery_images').find({}).toArray();
-    return images.map(this.transformMongoDoc);
+  async getAllUsers(): Promise<User[]> {
+    const users = await this.db.collection('users').find({}).toArray();
+    return users.map(user => this.transformMongoDoc(user));
   }
 
-  async getGalleryImage(id: number): Promise<GalleryImage | undefined> {
-    if (!this.db) await this.initializeDatabase();
-    const image = await this.db.collection('gallery_images').findOne({ _id: new ObjectId(id.toString()) });
-    return image ? this.transformMongoDoc(image) : undefined;
-  }
-
-  async createGalleryImage(imageData: InsertGalleryImage): Promise<GalleryImage> {
-    if (!this.db) await this.initializeDatabase();
-    const result = await this.db.collection('gallery_images').insertOne({
-      ...imageData,
-      createdAt: new Date(),
-    });
-    
-    const image = await this.db.collection('gallery_images').findOne({ _id: result.insertedId });
-    return this.transformMongoDoc(image);
-  }
-
-  async deleteGalleryImage(id: number): Promise<boolean> {
-    if (!this.db) await this.initializeDatabase();
-    const result = await this.db.collection('gallery_images').deleteOne({ _id: new ObjectId(id.toString()) });
-    return result.deletedCount > 0;
-  }
-
-  // Contact message operations
-  async getContactMessages(): Promise<ContactMessage[]> {
-    if (!this.db) await this.initializeDatabase();
-    const messages = await this.db.collection('contact_messages').find({}).sort({ createdAt: -1 }).toArray();
-    return messages.map(this.transformMongoDoc);
-  }
-
-  async getContactMessage(id: number): Promise<ContactMessage | undefined> {
-    if (!this.db) await this.initializeDatabase();
-    const message = await this.db.collection('contact_messages').findOne({ _id: new ObjectId(id.toString()) });
-    return message ? this.transformMongoDoc(message) : undefined;
-  }
-
-  async createContactMessage(messageData: InsertContactMessage): Promise<ContactMessage> {
-    if (!this.db) await this.initializeDatabase();
-    const result = await this.db.collection('contact_messages').insertOne({
-      ...messageData,
-      isRead: false,
-      createdAt: new Date(),
-    });
-    
-    const message = await this.db.collection('contact_messages').findOne({ _id: result.insertedId });
-    return this.transformMongoDoc(message);
-  }
-
-  async markMessageAsRead(id: number): Promise<boolean> {
-    if (!this.db) await this.initializeDatabase();
-    const result = await this.db.collection('contact_messages').updateOne(
-      { _id: new ObjectId(id.toString()) },
-      { $set: { isRead: true } }
+  async updateUserPassword(id: string, hashedPassword: string): Promise<boolean> {
+    const result = await this.db.collection('users').updateOne(
+      { id },
+      { $set: { password: hashedPassword, updatedAt: new Date() } }
     );
     return result.modifiedCount > 0;
   }
 
-  async deleteContactMessage(id: number): Promise<boolean> {
-    if (!this.db) await this.initializeDatabase();
-    const result = await this.db.collection('contact_messages').deleteOne({ _id: new ObjectId(id.toString()) });
+  async setResetToken(email: string, token: string, expiry: Date): Promise<boolean> {
+    const result = await this.db.collection('users').updateOne(
+      { email },
+      { $set: { resetToken: token, resetTokenExpiry: expiry, updatedAt: new Date() } }
+    );
+    return result.modifiedCount > 0;
+  }
+
+  async getUserByResetToken(token: string): Promise<User | undefined> {
+    const user = await this.db.collection('users').findOne({
+      resetToken: token,
+      resetTokenExpiry: { $gt: new Date() }
+    });
+    return user ? this.transformMongoDoc(user) : undefined;
+  }
+
+  async clearResetToken(id: string): Promise<boolean> {
+    const result = await this.db.collection('users').updateOne(
+      { id },
+      { $unset: { resetToken: "", resetTokenExpiry: "" }, $set: { updatedAt: new Date() } }
+    );
+    return result.modifiedCount > 0;
+  }
+
+  // Product operations
+  async getProducts(): Promise<Product[]> {
+    const products = await this.db.collection('products').find({}).toArray();
+    return products.map(product => this.transformMongoDoc(product));
+  }
+
+  async getProduct(id: string): Promise<Product | undefined> {
+    const product = await this.db.collection('products').findOne({ id });
+    return product ? this.transformMongoDoc(product) : undefined;
+  }
+
+  async createProduct(productData: InsertProduct): Promise<Product> {
+    const id = new ObjectId().toString();
+    const product = {
+      id,
+      ...productData,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    await this.db.collection('products').insertOne(product);
+    return this.transformMongoDoc(product);
+  }
+
+  async updateProduct(id: string, productData: Partial<Product>): Promise<Product | undefined> {
+    const result = await this.db.collection('products').findOneAndUpdate(
+      { id },
+      { $set: { ...productData, updatedAt: new Date() } },
+      { returnDocument: 'after' }
+    );
+    return result ? this.transformMongoDoc(result) : undefined;
+  }
+
+  async deleteProduct(id: string): Promise<boolean> {
+    const result = await this.db.collection('products').deleteOne({ id });
     return result.deletedCount > 0;
   }
 
-  // Admin operations
-  async getAdminByEmail(email: string): Promise<AdminUser | undefined> {
-    if (!this.db) await this.initializeDatabase();
-    const admin = await this.db.collection('admin_users').findOne({ email });
-    return admin ? this.transformMongoDoc(admin) : undefined;
+  async updateProductStock(id: string, quantity: number): Promise<boolean> {
+    const result = await this.db.collection('products').updateOne(
+      { id },
+      { $inc: { stock: quantity }, $set: { updatedAt: new Date() } }
+    );
+    return result.modifiedCount > 0;
   }
 
-  async createAdmin(adminData: InsertAdminUser): Promise<AdminUser> {
-    if (!this.db) await this.initializeDatabase();
-    const result = await this.db.collection('admin_users').insertOne({
-      ...adminData,
-      createdAt: new Date(),
-    });
+  async getLowStockProducts(): Promise<Product[]> {
+    const products = await this.db.collection('products').find({
+      $expr: { $lte: ["$stock", "$minStock"] }
+    }).toArray();
+    return products.map(product => this.transformMongoDoc(product));
+  }
+
+  // Order operations
+  async getOrders(): Promise<Order[]> {
+    const orders = await this.db.collection('orders').find({}).sort({ orderDate: -1 }).toArray();
+    return orders.map(order => this.transformMongoDoc(order));
+  }
+
+  async getOrdersByUserId(userId: string): Promise<Order[]> {
+    const orders = await this.db.collection('orders').find({ userId }).sort({ orderDate: -1 }).toArray();
+    return orders.map(order => this.transformMongoDoc(order));
+  }
+
+  async getOrder(id: string): Promise<Order | undefined> {
+    const order = await this.db.collection('orders').findOne({ id });
+    return order ? this.transformMongoDoc(order) : undefined;
+  }
+
+  async createOrder(orderData: InsertOrder, userId: string): Promise<Order> {
+    const id = new ObjectId().toString();
+    const orderNumber = `ORD-${Date.now()}`;
     
-    const admin = await this.db.collection('admin_users').findOne({ _id: result.insertedId });
-    return this.transformMongoDoc(admin);
+    // Calculate total amount
+    let totalAmount = 0;
+    const items = [];
+    for (const item of orderData.items) {
+      const product = await this.getProduct(item.productId);
+      if (product) {
+        const unitPrice = parseFloat(product.price.replace('₹', ''));
+        const totalPrice = unitPrice * item.quantity;
+        totalAmount += totalPrice;
+        items.push({
+          productId: item.productId,
+          productName: product.name,
+          quantity: item.quantity,
+          unitPrice,
+          totalPrice,
+        });
+      }
+    }
+
+    const order = {
+      id,
+      orderNumber,
+      customerId: userId,
+      customerName: orderData.customerName,
+      customerEmail: orderData.customerEmail,
+      items,
+      totalAmount,
+      status: 'pending',
+      orderDate: new Date(),
+      distributorId: orderData.distributorId,
+      notes: orderData.notes,
+    };
+    
+    await this.db.collection('orders').insertOne(order);
+    return this.transformMongoDoc(order);
   }
 
-  // Helper method to transform MongoDB documents
+  async updateOrderStatus(id: string, status: string): Promise<boolean> {
+    const result = await this.db.collection('orders').updateOne(
+      { id },
+      { $set: { status } }
+    );
+    return result.modifiedCount > 0;
+  }
+
+  async getOrdersByDateRange(startDate: Date, endDate: Date): Promise<Order[]> {
+    const orders = await this.db.collection('orders').find({
+      orderDate: { $gte: startDate, $lte: endDate }
+    }).sort({ orderDate: -1 }).toArray();
+    return orders.map(order => this.transformMongoDoc(order));
+  }
+
+  // Production operations
+  async getProductionBatches(): Promise<ProductionBatch[]> {
+    const batches = await this.db.collection('productionBatches').find({}).sort({ startDate: -1 }).toArray();
+    return batches.map(batch => this.transformMongoDoc(batch));
+  }
+
+  async getProductionBatch(id: string): Promise<ProductionBatch | undefined> {
+    const batch = await this.db.collection('productionBatches').findOne({ id });
+    return batch ? this.transformMongoDoc(batch) : undefined;
+  }
+
+  async createProductionBatch(batchData: Partial<ProductionBatch>): Promise<ProductionBatch> {
+    const id = new ObjectId().toString();
+    const batchNumber = `BATCH-${Date.now()}`;
+    const batch = {
+      id,
+      batchNumber,
+      ...batchData,
+    };
+    
+    await this.db.collection('productionBatches').insertOne(batch);
+    return this.transformMongoDoc(batch);
+  }
+
+  async updateProductionBatchStatus(id: string, status: string): Promise<boolean> {
+    const updateData: any = { status };
+    if (status === 'completed') {
+      updateData.actualEndDate = new Date();
+    }
+
+    const result = await this.db.collection('productionBatches').updateOne(
+      { id },
+      { $set: updateData }
+    );
+    return result.modifiedCount > 0;
+  }
+
+  async getProductionBatchesByStatus(status: string): Promise<ProductionBatch[]> {
+    const batches = await this.db.collection('productionBatches').find({ status }).toArray();
+    return batches.map(batch => this.transformMongoDoc(batch));
+  }
+
+  // Inventory operations
+  async getInventoryMovements(): Promise<InventoryMovement[]> {
+    const movements = await this.db.collection('inventoryMovements').find({}).sort({ date: -1 }).toArray();
+    return movements.map(movement => this.transformMongoDoc(movement));
+  }
+
+  async createInventoryMovement(movementData: Partial<InventoryMovement>): Promise<InventoryMovement> {
+    const id = new ObjectId().toString();
+    const movement = {
+      id,
+      ...movementData,
+      date: new Date(),
+    };
+    
+    await this.db.collection('inventoryMovements').insertOne(movement);
+    
+    // Update product stock
+    if (movement.productId && movement.quantity) {
+      const stockChange = movement.type === 'in' ? movement.quantity : -movement.quantity;
+      await this.updateProductStock(movement.productId, stockChange);
+    }
+    
+    return this.transformMongoDoc(movement);
+  }
+
+  async getInventoryMovementsByProduct(productId: string): Promise<InventoryMovement[]> {
+    const movements = await this.db.collection('inventoryMovements').find({ productId }).sort({ date: -1 }).toArray();
+    return movements.map(movement => this.transformMongoDoc(movement));
+  }
+
+  async getInventoryMovementsByDateRange(startDate: Date, endDate: Date): Promise<InventoryMovement[]> {
+    const movements = await this.db.collection('inventoryMovements').find({
+      date: { $gte: startDate, $lte: endDate }
+    }).sort({ date: -1 }).toArray();
+    return movements.map(movement => this.transformMongoDoc(movement));
+  }
+
+  // Financial operations
+  async getFinancialRecords(): Promise<FinancialRecord[]> {
+    const records = await this.db.collection('financialRecords').find({}).sort({ date: -1 }).toArray();
+    return records.map(record => this.transformMongoDoc(record));
+  }
+
+  async createFinancialRecord(recordData: Partial<FinancialRecord>): Promise<FinancialRecord> {
+    const id = new ObjectId().toString();
+    const record = {
+      id,
+      ...recordData,
+      date: new Date(),
+      approved: false,
+    };
+    
+    await this.db.collection('financialRecords').insertOne(record);
+    return this.transformMongoDoc(record);
+  }
+
+  async updateFinancialRecordApproval(id: string, approved: boolean, approvedBy: string): Promise<boolean> {
+    const result = await this.db.collection('financialRecords').updateOne(
+      { id },
+      { $set: { approved, approvedBy } }
+    );
+    return result.modifiedCount > 0;
+  }
+
+  async getFinancialRecordsByDateRange(startDate: Date, endDate: Date): Promise<FinancialRecord[]> {
+    const records = await this.db.collection('financialRecords').find({
+      date: { $gte: startDate, $lte: endDate }
+    }).sort({ date: -1 }).toArray();
+    return records.map(record => this.transformMongoDoc(record));
+  }
+
+  async getFinancialSummary(startDate: Date, endDate: Date): Promise<{income: number, expense: number}> {
+    const pipeline = [
+      {
+        $match: {
+          date: { $gte: startDate, $lte: endDate },
+          approved: true
+        }
+      },
+      {
+        $group: {
+          _id: "$type",
+          total: { $sum: "$amount" }
+        }
+      }
+    ];
+
+    const results = await this.db.collection('financialRecords').aggregate(pipeline).toArray();
+    
+    let income = 0;
+    let expense = 0;
+    
+    results.forEach(result => {
+      if (result._id === 'income') income = result.total;
+      if (result._id === 'expense') expense = result.total;
+    });
+
+    return { income, expense };
+  }
+
+  // Distributor operations
+  async getDistributors(): Promise<Distributor[]> {
+    const distributors = await this.db.collection('distributors').find({}).toArray();
+    return distributors.map(distributor => this.transformMongoDoc(distributor));
+  }
+
+  async getDistributor(id: string): Promise<Distributor | undefined> {
+    const distributor = await this.db.collection('distributors').findOne({ id });
+    return distributor ? this.transformMongoDoc(distributor) : undefined;
+  }
+
+  async createDistributor(distributorData: Partial<Distributor>): Promise<Distributor> {
+    const id = new ObjectId().toString();
+    const distributor = {
+      id,
+      ...distributorData,
+      createdAt: new Date(),
+    };
+    
+    await this.db.collection('distributors').insertOne(distributor);
+    return this.transformMongoDoc(distributor);
+  }
+
+  async updateDistributor(id: string, updates: Partial<Distributor>): Promise<Distributor | undefined> {
+    const result = await this.db.collection('distributors').findOneAndUpdate(
+      { id },
+      { $set: updates },
+      { returnDocument: 'after' }
+    );
+    return result ? this.transformMongoDoc(result) : undefined;
+  }
+
+  async getDistributorByUserId(userId: string): Promise<Distributor | undefined> {
+    const distributor = await this.db.collection('distributors').findOne({ userId });
+    return distributor ? this.transformMongoDoc(distributor) : undefined;
+  }
+
   private transformMongoDoc(doc: any): any {
     if (!doc) return doc;
     const { _id, ...rest } = doc;
-    return {
-      id: _id.toString(),
-      ...rest,
-    };
+    return rest;
   }
 }
 
