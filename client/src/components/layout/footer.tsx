@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Facebook, Instagram, Twitter } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logoPath from "@assets/image_1749285656583.png";
+const logoPath = "https://sunrisefoods.in/assets/img/Global/Everyday118x72.png";
 
 export default function Footer() {
   return (
