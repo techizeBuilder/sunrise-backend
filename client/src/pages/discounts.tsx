@@ -417,6 +417,7 @@ export default function Discounts() {
                         <SelectValue placeholder="Select specific product" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="">None</SelectItem>
                         {products?.map((product: any) => (
                           <SelectItem key={product.id} value={product.id}>
                             {product.name}
@@ -433,6 +434,7 @@ export default function Discounts() {
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="">None</SelectItem>
                         {categories?.map((category: any) => (
                           <SelectItem key={category.id} value={category.id}>
                             {category.name}
