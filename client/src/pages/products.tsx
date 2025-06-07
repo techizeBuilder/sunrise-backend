@@ -41,12 +41,12 @@ export default function Products() {
   const canDeleteProducts = user?.role === 'admin';
 
   // Fetch products
-  const { data: allProducts = [], isLoading: productsLoading } = useQuery({
+  const { data: allProducts = [], isLoading: productsLoading } = useQuery<Product[]>({
     queryKey: ["/api/products"],
   });
 
   // Client-side filtering for better user experience
-  const filteredProducts = allProducts.filter((product: Product) => {
+  const filteredProducts = Array.isArray(allProducts) ? allProducts.filter((product: Product) => {
     // Search filter
     if (searchQuery && !product.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
         !product.description.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -64,7 +64,7 @@ export default function Products() {
     if (stockFilter === "out-of-stock" && product.stock > 0) return false;
     
     return true;
-  });
+  }) : [];
 
   const products = filteredProducts;
 
@@ -278,7 +278,7 @@ export default function Products() {
           </div>
           {!canManageProducts && (
             <div className="mt-4 text-sm text-muted-foreground">
-              Showing {products.length} of {allProducts.length} products
+              Showing {products.length} of {Array.isArray(allProducts) ? allProducts.length : 0} products
             </div>
           )}
         </CardContent>
