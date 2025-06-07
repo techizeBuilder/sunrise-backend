@@ -347,31 +347,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/products/search", async (req, res) => {
-    try {
-      const { q } = req.query;
-      if (!q || typeof q !== 'string') {
-        return res.status(400).json({ message: "Search query required" });
-      }
-      
-      const products = await storage.searchProducts(q);
-      res.json(products);
-    } catch (error) {
-      console.error("Search products error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  app.get("/api/products/low-stock", requireAuth, async (req, res) => {
-    try {
-      const products = await storage.getLowStockProducts();
-      res.json(products);
-    } catch (error) {
-      console.error("Get low stock products error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
   app.patch("/api/products/:id/stock", requireAuth, requireRole(['admin', 'inventory']), async (req, res) => {
     try {
       const { id } = req.params;
