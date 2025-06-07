@@ -21,8 +21,8 @@ function Router() {
   const [location] = useLocation();
   const { isAuthenticated, isLoading } = useAuth();
 
-  // Don't show navbar/footer on login, dashboard, or profile pages
-  const isAuthPage = location === "/login" || location === "/dashboard" || location === "/profile";
+  // Don't show navbar/footer on auth pages
+  const isAuthPage = location === "/login" || location === "/dashboard" || location === "/profile" || location === "/reset-password";
 
   if (isAuthPage) {
     return (
@@ -31,6 +31,7 @@ function Router() {
           <Route path="/login" component={Login} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/profile" component={Profile} />
+          <Route path="/reset-password" component={ResetPassword} />
           <Route component={NotFound} />
         </Switch>
       </div>

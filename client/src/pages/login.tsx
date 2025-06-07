@@ -96,6 +96,14 @@ export default function Login() {
               </Button>
             </form>
           </Form>
+
+          <div className="text-center mt-4">
+            <Link href="/reset-password">
+              <Button variant="link" className="text-sm text-orange-600 hover:text-orange-700">
+                Forgot your password?
+              </Button>
+            </Link>
+          </div>
           
           {/* Demo Credentials */}
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
