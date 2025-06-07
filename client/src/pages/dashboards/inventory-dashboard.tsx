@@ -4,7 +4,8 @@ import DashboardLayout from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Warehouse, Package, AlertTriangle, TrendingDown, Plus, BarChart3 } from "lucide-react";
+import { Link } from "wouter";
+import { Warehouse, Package, AlertTriangle, TrendingDown, Plus, BarChart3, FolderTree } from "lucide-react";
 
 export default function InventoryDashboard() {
   const { data: stats } = useQuery({
@@ -126,48 +127,55 @@ export default function InventoryDashboard() {
         )}
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Card className="border-yellow-200 bg-yellow-50">
-            <CardHeader>
-              <CardTitle className="flex items-center text-yellow-800">
-                <Plus className="h-5 w-5 mr-2" />
-                Record Movement
-              </CardTitle>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Link href="/manage/products">
+            <Card className="cursor-pointer hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Product Management</CardTitle>
+                <Package className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground">
+                  Manage products and inventory levels
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/manage/categories">
+            <Card className="cursor-pointer hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Category Management</CardTitle>
+                <FolderTree className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-muted-foreground">
+                  Organize products with categories
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Card className="border-yellow-200 bg-yellow-50 cursor-pointer hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-yellow-800">Record Movement</CardTitle>
+              <Plus className="h-4 w-4 text-yellow-600" />
             </CardHeader>
             <CardContent>
-              <p className="text-yellow-700 mb-4">
-                Add stock in/out or make inventory adjustments
+              <p className="text-xs text-yellow-700">
+                Add stock adjustments
               </p>
-              <Button className="w-full bg-yellow-600 hover:bg-yellow-700">
-                New Movement
-              </Button>
             </CardContent>
           </Card>
 
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
-                Stock Reports
-              </CardTitle>
+          <Card className="cursor-pointer hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Stock Reports</CardTitle>
+              <BarChart3 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Generate detailed inventory reports and analytics
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-md transition-shadow cursor-pointer">
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Package className="h-5 w-5 mr-2 text-green-600" />
-                Manage Products
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Add new products or update existing inventory items
+              <p className="text-xs text-muted-foreground">
+                Generate inventory analytics
               </p>
             </CardContent>
           </Card>
