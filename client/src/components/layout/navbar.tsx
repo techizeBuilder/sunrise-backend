@@ -35,25 +35,25 @@ export default function Navbar() {
   return (
     <nav className="bg-card shadow-lg sticky top-0 z-50">
       <div className="container-max">
-        <div className="flex justify-between items-center h-16 px-4">
+        <div className="flex justify-between items-center h-14 sm:h-16 px-3 sm:px-4">
           <div className="flex items-center">
             <Link href="/">
               <img 
                 src="/logo.png" 
                 alt="Golden Crust Bakery" 
-                className="h-12 w-auto hover:opacity-80 transition-opacity"
+                className="h-8 sm:h-10 lg:h-12 w-auto hover:opacity-80 transition-opacity"
               />
             </Link>
           </div>
           
           {/* Desktop Navigation */}
           <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-8">
+            <div className="ml-6 lg:ml-10 flex items-baseline space-x-4 lg:space-x-8">
               {navItems.map((item) => (
                 <Link 
                   key={item.href} 
                   href={item.href}
-                  className={`nav-link px-3 py-2 ${
+                  className={`nav-link px-2 lg:px-3 py-2 text-sm lg:text-base ${
                     location === item.href 
                       ? "text-primary" 
                       : "text-foreground hover:text-primary"
@@ -64,7 +64,7 @@ export default function Navbar() {
               ))}
               <button
                 onClick={scrollToAbout}
-                className="nav-link px-3 py-2 text-foreground hover:text-primary transition-colors"
+                className="nav-link px-2 lg:px-3 py-2 text-sm lg:text-base text-foreground hover:text-primary transition-colors"
               >
                 About
               </button>
