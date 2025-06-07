@@ -724,17 +724,17 @@ export default function Discounts() {
                       <Label htmlFor="edit-value">Discount Value</Label>
                       <Input
                         id="edit-value"
-                        name="value"
                         type="number"
                         step="0.01"
-                        defaultValue={editingDiscount.value}
+                        value={editFormData.value}
+                        onChange={(e) => setEditFormData(prev => ({ ...prev, value: e.target.value }))}
                         required
                       />
                     </div>
 
                     <div>
                       <Label htmlFor="edit-applicationType">Application Type</Label>
-                      <Select name="applicationType" defaultValue={editingDiscount.applicationType}>
+                      <Select value={editFormData.applicationType} onValueChange={(value) => setEditFormData(prev => ({ ...prev, applicationType: value }))}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -752,9 +752,9 @@ export default function Discounts() {
                       <Label htmlFor="edit-validFrom">Valid From</Label>
                       <Input
                         id="edit-validFrom"
-                        name="validFrom"
                         type="datetime-local"
-                        defaultValue={new Date(editingDiscount.validFrom).toISOString().slice(0, 16)}
+                        value={editFormData.validFrom}
+                        onChange={(e) => setEditFormData(prev => ({ ...prev, validFrom: e.target.value }))}
                         required
                       />
                     </div>
@@ -763,9 +763,9 @@ export default function Discounts() {
                       <Label htmlFor="edit-validTo">Valid To</Label>
                       <Input
                         id="edit-validTo"
-                        name="validTo"
                         type="datetime-local"
-                        defaultValue={new Date(editingDiscount.validTo).toISOString().slice(0, 16)}
+                        value={editFormData.validTo}
+                        onChange={(e) => setEditFormData(prev => ({ ...prev, validTo: e.target.value }))}
                         required
                       />
                     </div>
@@ -783,7 +783,7 @@ export default function Discounts() {
 
                   <div>
                     <Label htmlFor="edit-isActive">Status</Label>
-                    <Select name="isActive" defaultValue={editingDiscount.isActive.toString()}>
+                    <Select value={editFormData.isActive.toString()} onValueChange={(value) => setEditFormData(prev => ({ ...prev, isActive: value === "true" }))}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
