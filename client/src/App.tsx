@@ -13,14 +13,16 @@ import Gallery from "@/pages/gallery";
 import Contact from "@/pages/contact";
 import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
+import Profile from "@/pages/profile";
+import ResetPassword from "@/pages/reset-password";
 import NotFound from "@/pages/not-found";
 
 function Router() {
   const [location] = useLocation();
   const { isAuthenticated, isLoading } = useAuth();
 
-  // Don't show navbar/footer on login or dashboard pages
-  const isAuthPage = location === "/login" || location.startsWith("/dashboard");
+  // Don't show navbar/footer on login, dashboard, or profile pages
+  const isAuthPage = location === "/login" || location === "/dashboard" || location === "/profile";
 
   if (isAuthPage) {
     return (
@@ -28,6 +30,7 @@ function Router() {
         <Switch>
           <Route path="/login" component={Login} />
           <Route path="/dashboard" component={Dashboard} />
+          <Route path="/profile" component={Profile} />
           <Route component={NotFound} />
         </Switch>
       </div>

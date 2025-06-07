@@ -72,10 +72,15 @@ export default function DashboardLayout({ children, title, subtitle }: Dashboard
               </Badge>
             </div>
             
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => window.location.href = "/profile"}
+              className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-900"
+            >
               <User className="h-4 w-4" />
               <span>{user.firstName} {user.lastName}</span>
-            </div>
+            </Button>
             
             <Button 
               variant="outline" 
