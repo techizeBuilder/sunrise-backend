@@ -43,9 +43,9 @@ const roleColors = {
 export default function DashboardLayout({ children, title, subtitle }: DashboardLayoutProps) {
   const { user, logout } = useAuth();
 
-  if (!user) return null;
+  if (!user || !user.role) return null;
 
-  const RoleIcon = roleIcons[user.role];
+  const RoleIcon = roleIcons[user.role as keyof typeof roleIcons] || Settings;
 
   return (
     <div className="min-h-screen bg-gray-50">
