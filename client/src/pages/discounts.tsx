@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import ManagementLayout from "@/components/layout/management-layout";
 import { ImageUpload } from "@/components/ui/image-upload";
-import type { Discount, InsertDiscount } from "@shared/schema";
+import type { Discount, InsertDiscount, Product, ProductCategory } from "@shared/schema";
 
 export default function Discounts() {
   const { toast } = useToast();
@@ -28,11 +28,11 @@ export default function Discounts() {
     queryKey: ["/api/discounts"],
   });
 
-  const { data: products } = useQuery<Product[]>({
+  const { data: products } = useQuery({
     queryKey: ["/api/products"],
   });
 
-  const { data: categories } = useQuery<ProductCategory[]>({
+  const { data: categories } = useQuery({
     queryKey: ["/api/categories"],
   });
 
@@ -418,13 +418,13 @@ export default function Discounts() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">None</SelectItem>
-                        {(products || []).map((product: Product) => (
+                        {Array.isArray(products) ? products.map((product: any) => (
                           product.id ? (
                             <SelectItem key={product.id} value={product.id}>
                               {product.name}
                             </SelectItem>
                           ) : null
-                        ))}
+                        )) : []}
                       </SelectContent>
                     </Select>
                   </div>
@@ -437,13 +437,13 @@ export default function Discounts() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">None</SelectItem>
-                        {categories?.map((category: any) => (
+                        {Array.isArray(categories) ? categories.map((category: any) => (
                           category.id ? (
                             <SelectItem key={category.id} value={category.id}>
                               {category.name}
                             </SelectItem>
                           ) : null
-                        ))}
+                        )) : []}
                       </SelectContent>
                     </Select>
                   </div>
