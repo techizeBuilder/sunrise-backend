@@ -45,15 +45,29 @@ export default function AdminDashboard() {
       <div className="space-y-6">
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Link href="/product-management">
+            <Card className="cursor-pointer hover:shadow-md transition-shadow border-2 border-blue-200 bg-blue-50">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-blue-800">Product Management Hub</CardTitle>
+                <Package className="h-4 w-4 text-blue-600" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-blue-700">
+                  Complete product management suite
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
           <Link href="/manage/products">
             <Card className="cursor-pointer hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Product Management</CardTitle>
+                <CardTitle className="text-sm font-medium">Product Catalog</CardTitle>
                 <Package className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <p className="text-xs text-muted-foreground">
-                  Manage products, inventory, and pricing
+                  Browse & manage inventory
                 </p>
               </CardContent>
             </Card>
@@ -62,12 +76,12 @@ export default function AdminDashboard() {
           <Link href="/manage/categories">
             <Card className="cursor-pointer hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Category Management</CardTitle>
+                <CardTitle className="text-sm font-medium">Categories</CardTitle>
                 <FolderTree className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <p className="text-xs text-muted-foreground">
-                  Organize products with categories
+                  Organize product groups
                 </p>
               </CardContent>
             </Card>

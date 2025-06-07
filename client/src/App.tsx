@@ -10,6 +10,9 @@ import Home from "@/pages/home";
 import About from "@/pages/about";
 import Products from "@/pages/products";
 import Categories from "@/pages/categories";
+import ProductHub from "@/pages/product-hub";
+import PriceLists from "@/pages/price-lists";
+import Discounts from "@/pages/discounts";
 import Gallery from "@/pages/gallery";
 import Contact from "@/pages/contact";
 import Login from "@/pages/login";
@@ -33,8 +36,11 @@ function Router() {
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/profile" component={Profile} />
           <Route path="/reset-password" component={ResetPassword} />
+          <Route path="/product-management" component={ProductHub} />
           <Route path="/manage/products" component={Products} />
           <Route path="/manage/categories" component={Categories} />
+          <Route path="/manage/price-lists" component={PriceLists} />
+          <Route path="/manage/discounts" component={Discounts} />
           <Route component={NotFound} />
         </Switch>
       </div>

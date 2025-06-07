@@ -128,10 +128,24 @@ export default function InventoryDashboard() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Link href="/product-management">
+            <Card className="cursor-pointer hover:shadow-md transition-shadow border-2 border-green-200 bg-green-50">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-green-800">Product Management Hub</CardTitle>
+                <Package className="h-4 w-4 text-green-600" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-green-700">
+                  Complete inventory management suite
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
           <Link href="/manage/products">
             <Card className="cursor-pointer hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Product Management</CardTitle>
+                <CardTitle className="text-sm font-medium">Product Catalog</CardTitle>
                 <Package className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -145,7 +159,7 @@ export default function InventoryDashboard() {
           <Link href="/manage/categories">
             <Card className="cursor-pointer hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Category Management</CardTitle>
+                <CardTitle className="text-sm font-medium">Categories</CardTitle>
                 <FolderTree className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
