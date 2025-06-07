@@ -438,9 +438,11 @@ export default function Discounts() {
                       <SelectContent>
                         <SelectItem value="none">None</SelectItem>
                         {categories?.map((category: any) => (
-                          <SelectItem key={category.id} value={category.id}>
-                            {category.name}
-                          </SelectItem>
+                          category.id ? (
+                            <SelectItem key={category.id} value={category.id}>
+                              {category.name}
+                            </SelectItem>
+                          ) : null
                         ))}
                       </SelectContent>
                     </Select>
