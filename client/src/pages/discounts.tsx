@@ -12,6 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import ManagementLayout from "@/components/layout/management-layout";
+import { ImageUpload } from "@/components/ui/image-upload";
 import type { Discount, InsertDiscount } from "@shared/schema";
 
 export default function Discounts() {
@@ -20,6 +21,8 @@ export default function Discounts() {
   const [editingDiscount, setEditingDiscount] = useState<Discount | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
+  const [createImageUrl, setCreateImageUrl] = useState("");
+  const [editImageUrl, setEditImageUrl] = useState("");
 
   const { data: discounts, isLoading } = useQuery({
     queryKey: ["/api/discounts"],
@@ -41,6 +44,7 @@ export default function Discounts() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/discounts"] });
       setIsCreateDialogOpen(false);
+      setCreateImageUrl("");
       toast({
         title: "Success",
         description: "Discount created successfully",
@@ -64,6 +68,7 @@ export default function Discounts() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/discounts"] });
       setEditingDiscount(null);
+      setEditImageUrl("");
       toast({
         title: "Success",
         description: "Discount updated successfully",
@@ -102,19 +107,22 @@ export default function Discounts() {
     const discountData: InsertDiscount = {
       name: formData.get("name") as string,
       description: formData.get("description") as string,
-      type: formData.get("type") as "percentage" | "fixed_amount" | "buy_x_get_y",
+      type: formData.get("type") as "percentage" | "fixed_amount",
       value: parseFloat(formData.get("value") as string),
-      applicationType: formData.get("applicationType") as "product" | "category" | "order",
-      productId: formData.get("productId") as string || undefined,
-      categoryId: formData.get("categoryId") as string || undefined,
-      minQuantity: parseInt(formData.get("minQuantity") as string) || undefined,
-      maxQuantity: parseInt(formData.get("maxQuantity") as string) || undefined,
-      minOrderValue: parseFloat(formData.get("minOrderValue") as string) || undefined,
-      customerGroup: formData.get("customerGroup") as string || undefined,
+      applicationType: formData.get("applicationType") as "product" | "category" | "order" | "customer",
+      targetIds: [formData.get("productId") as string || formData.get("categoryId") as string || ""].filter(Boolean),
+      conditions: {
+        minQuantity: parseInt(formData.get("minQuantity") as string) || undefined,
+        maxQuantity: parseInt(formData.get("maxQuantity") as string) || undefined,
+        minOrderValue: parseFloat(formData.get("minOrderValue") as string) || undefined,
+        customerGroup: formData.get("customerGroup") as string || undefined,
+      },
       validFrom: new Date(formData.get("validFrom") as string),
       validTo: new Date(formData.get("validTo") as string),
       isActive: formData.get("isActive") === "true",
       usageLimit: parseInt(formData.get("usageLimit") as string) || undefined,
+      usedCount: 0,
+      imageUrl: createImageUrl || undefined,
     };
 
     createMutation.mutate(discountData);
@@ -126,19 +134,21 @@ export default function Discounts() {
     const discountData: Partial<Discount> = {
       name: formData.get("name") as string,
       description: formData.get("description") as string,
-      type: formData.get("type") as "percentage" | "fixed_amount" | "buy_x_get_y",
+      type: formData.get("type") as "percentage" | "fixed_amount",
       value: parseFloat(formData.get("value") as string),
-      applicationType: formData.get("applicationType") as "product" | "category" | "order",
-      productId: formData.get("productId") as string || undefined,
-      categoryId: formData.get("categoryId") as string || undefined,
-      minQuantity: parseInt(formData.get("minQuantity") as string) || undefined,
-      maxQuantity: parseInt(formData.get("maxQuantity") as string) || undefined,
-      minOrderValue: parseFloat(formData.get("minOrderValue") as string) || undefined,
-      customerGroup: formData.get("customerGroup") as string || undefined,
+      applicationType: formData.get("applicationType") as "product" | "category" | "order" | "customer",
+      targetIds: [formData.get("productId") as string || formData.get("categoryId") as string || ""].filter(Boolean),
+      conditions: {
+        minQuantity: parseInt(formData.get("minQuantity") as string) || undefined,
+        maxQuantity: parseInt(formData.get("maxQuantity") as string) || undefined,
+        minOrderValue: parseFloat(formData.get("minOrderValue") as string) || undefined,
+        customerGroup: formData.get("customerGroup") as string || undefined,
+      },
       validFrom: new Date(formData.get("validFrom") as string),
       validTo: new Date(formData.get("validTo") as string),
       isActive: formData.get("isActive") === "true",
       usageLimit: parseInt(formData.get("usageLimit") as string) || undefined,
+      imageUrl: editImageUrl || editingDiscount.imageUrl,
     };
 
     updateMutation.mutate({ id: editingDiscount.id, data: discountData });

@@ -157,6 +157,7 @@ export default function Categories() {
                         size="sm"
                         onClick={() => {
                           setEditingCategory(category);
+                          setEditImageUrl(category.imageUrl || "");
                           setIsEditDialogOpen(true);
                         }}
                       >
@@ -250,8 +251,13 @@ export default function Categories() {
                 <Textarea id="edit-description" name="description" defaultValue={editingCategory.description} required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-imageUrl">Image URL (Optional)</Label>
-                <Input id="edit-imageUrl" name="imageUrl" type="url" defaultValue={editingCategory.imageUrl || ""} />
+                <Label>Category Image (Optional)</Label>
+                <ImageUpload
+                  onImageUpload={setEditImageUrl}
+                  currentImage={editImageUrl || editingCategory.imageUrl}
+                  uploadEndpoint="/api/upload/category"
+                  label="Upload Category Image"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="edit-sortOrder">Sort Order</Label>
