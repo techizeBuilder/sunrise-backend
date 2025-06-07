@@ -78,6 +78,23 @@ export default function Discounts() {
       queryClient.invalidateQueries({ queryKey: ["/api/discounts"] });
       setIsCreateDialogOpen(false);
       setCreateImageUrl("");
+      // Reset form
+      setCreateFormData({
+        name: "",
+        description: "",
+        type: "",
+        value: "",
+        applicationType: "",
+        productId: "",
+        categoryId: "",
+        customerGroup: "",
+        minQuantity: "",
+        minOrderValue: "",
+        validFrom: "",
+        validTo: "",
+        isActive: true,
+        usageLimit: ""
+      });
       toast({
         title: "Success",
         description: "Discount created successfully",
@@ -99,6 +116,23 @@ export default function Discounts() {
       queryClient.invalidateQueries({ queryKey: ["/api/discounts"] });
       setEditingDiscount(null);
       setEditImageUrl("");
+      // Reset edit form
+      setEditFormData({
+        name: "",
+        description: "",
+        type: "",
+        value: "",
+        applicationType: "",
+        productId: "",
+        categoryId: "",
+        customerGroup: "",
+        minQuantity: "",
+        minOrderValue: "",
+        validFrom: "",
+        validTo: "",
+        isActive: true,
+        usageLimit: ""
+      });
       toast({
         title: "Success",
         description: "Discount updated successfully",
@@ -153,6 +187,26 @@ export default function Discounts() {
     };
 
     createMutation.mutate(discountData);
+  };
+
+  const initializeEditForm = (discount: Discount) => {
+    setEditFormData({
+      name: discount.name || "",
+      description: discount.description || "",
+      type: discount.type || "",
+      value: discount.value?.toString() || "",
+      applicationType: discount.applicationType || "",
+      productId: discount.targetIds?.[0] || "",
+      categoryId: discount.targetIds?.[0] || "",
+      customerGroup: discount.conditions?.customerGroups?.[0] || "",
+      minQuantity: discount.conditions?.minimumQuantity?.toString() || "",
+      minOrderValue: discount.conditions?.minimumOrderValue?.toString() || "",
+      validFrom: discount.validFrom ? new Date(discount.validFrom).toISOString().slice(0, 16) : "",
+      validTo: discount.validTo ? new Date(discount.validTo).toISOString().slice(0, 16) : "",
+      isActive: discount.isActive ?? true,
+      usageLimit: discount.usageLimit?.toString() || ""
+    });
+    setEditImageUrl(discount.imageUrl || "");
   };
 
   const handleUpdateDiscount = () => {
@@ -284,7 +338,10 @@ export default function Discounts() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setEditingDiscount(discount)}
+                          onClick={() => {
+                            setEditingDiscount(discount);
+                            initializeEditForm(discount);
+                          }}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -632,15 +689,15 @@ export default function Discounts() {
                       <Label htmlFor="edit-name">Name</Label>
                       <Input
                         id="edit-name"
-                        name="name"
-                        defaultValue={editingDiscount.name}
+                        value={editFormData.name}
+                        onChange={(e) => setEditFormData(prev => ({ ...prev, name: e.target.value }))}
                         required
                       />
                     </div>
                     
                     <div>
                       <Label htmlFor="edit-type">Discount Type</Label>
-                      <Select name="type" defaultValue={editingDiscount.type}>
+                      <Select value={editFormData.type} onValueChange={(value) => setEditFormData(prev => ({ ...prev, type: value }))}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -657,8 +714,8 @@ export default function Discounts() {
                     <Label htmlFor="edit-description">Description</Label>
                     <Textarea
                       id="edit-description"
-                      name="description"
-                      defaultValue={editingDiscount.description || ""}
+                      value={editFormData.description}
+                      onChange={(e) => setEditFormData(prev => ({ ...prev, description: e.target.value }))}
                     />
                   </div>
 
