@@ -73,10 +73,10 @@ export default function ManagementLayout({ children }: ManagementLayoutProps) {
               {user && (
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-600">
-                    {user.firstName} {user.lastName}
+                    {(user as any).firstName} {(user as any).lastName}
                   </span>
                   <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                    {user.role}
+                    {(user as any).role}
                   </span>
                 </div>
               )}

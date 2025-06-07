@@ -112,8 +112,10 @@ export default function Discounts() {
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Discount> }) =>
       apiRequest("PATCH", `/api/discounts/${id}`, data),
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/discounts"] });
+      // Force a refetch to ensure UI updates with latest data
+      queryClient.refetchQueries({ queryKey: ["/api/discounts"] });
       setEditingDiscount(null);
       setEditImageUrl("");
       // Reset edit form
@@ -139,9 +141,10 @@ export default function Discounts() {
       });
     },
     onError: (error) => {
+      console.error("Update discount error:", error);
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to update discount",
         variant: "destructive",
       });
     },
@@ -212,6 +215,16 @@ export default function Discounts() {
   const handleUpdateDiscount = () => {
     if (!editingDiscount) return;
 
+    // Validate required fields
+    if (!editFormData.name || !editFormData.type || !editFormData.value) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const discountData: Partial<Discount> = {
       name: editFormData.name,
       description: editFormData.description,
@@ -231,6 +244,7 @@ export default function Discounts() {
       imageUrl: editImageUrl || editingDiscount.imageUrl,
     };
 
+    console.log("Updating discount with data:", discountData);
     updateMutation.mutate({ id: editingDiscount.id, data: discountData });
   };
 
