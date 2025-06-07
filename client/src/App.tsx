@@ -9,6 +9,7 @@ import Footer from "@/components/layout/footer";
 import Home from "@/pages/home";
 import About from "@/pages/about";
 import Products from "@/pages/products";
+import Categories from "@/pages/categories";
 import Gallery from "@/pages/gallery";
 import Contact from "@/pages/contact";
 import Login from "@/pages/login";
@@ -22,7 +23,7 @@ function Router() {
   const { isAuthenticated, isLoading } = useAuth();
 
   // Don't show navbar/footer on auth pages
-  const isAuthPage = location === "/login" || location === "/dashboard" || location === "/profile" || location === "/reset-password";
+  const isAuthPage = location === "/login" || location === "/dashboard" || location === "/profile" || location === "/reset-password" || location.startsWith("/manage");
 
   if (isAuthPage) {
     return (
@@ -32,6 +33,8 @@ function Router() {
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/profile" component={Profile} />
           <Route path="/reset-password" component={ResetPassword} />
+          <Route path="/manage/products" component={Products} />
+          <Route path="/manage/categories" component={Categories} />
           <Route component={NotFound} />
         </Switch>
       </div>

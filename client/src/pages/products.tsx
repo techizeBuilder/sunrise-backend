@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import ManagementLayout from "@/components/layout/management-layout";
 import type { Product, ProductCategory, InsertProduct } from "@shared/schema";
 
 export default function Products() {
@@ -144,8 +145,9 @@ export default function Products() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <ManagementLayout>
+      <div className="space-y-6">
+        {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Product Management</h1>
@@ -574,6 +576,7 @@ export default function Products() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </ManagementLayout>
   );
 }
