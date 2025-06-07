@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import ManagementLayout from "@/components/layout/management-layout";
+import { ImageUpload } from "@/components/ui/image-upload";
 import type { ProductCategory, InsertCategory } from "@shared/schema";
 
 export default function Categories() {
@@ -17,6 +18,8 @@ export default function Categories() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<ProductCategory | null>(null);
+  const [createImageUrl, setCreateImageUrl] = useState("");
+  const [editImageUrl, setEditImageUrl] = useState("");
 
   // Fetch categories
   const { data: categories = [], isLoading } = useQuery<ProductCategory[]>({
@@ -29,6 +32,7 @@ export default function Categories() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
       setIsCreateDialogOpen(false);
+      setCreateImageUrl("");
       toast({ title: "Success", description: "Category created successfully" });
     },
     onError: (error) => {
@@ -44,6 +48,7 @@ export default function Categories() {
       queryClient.invalidateQueries({ queryKey: ["/api/categories"] });
       setIsEditDialogOpen(false);
       setEditingCategory(null);
+      setEditImageUrl("");
       toast({ title: "Success", description: "Category updated successfully" });
     },
     onError: (error) => {
@@ -71,7 +76,7 @@ export default function Categories() {
       name: formData.get("name") as string,
       description: formData.get("description") as string,
       parentId: (formData.get("parentId") as string) || undefined,
-      imageUrl: (formData.get("imageUrl") as string) || undefined,
+      imageUrl: createImageUrl || undefined,
       sortOrder: parseInt(formData.get("sortOrder") as string) || 0,
       isActive: true,
     };
@@ -89,7 +94,7 @@ export default function Categories() {
       name: formData.get("name") as string,
       description: formData.get("description") as string,
       parentId: (formData.get("parentId") as string) || undefined,
-      imageUrl: (formData.get("imageUrl") as string) || undefined,
+      imageUrl: editImageUrl || editingCategory.imageUrl,
       sortOrder: parseInt(formData.get("sortOrder") as string) || 0,
     };
 
@@ -201,8 +206,13 @@ export default function Categories() {
               <Textarea id="description" name="description" required />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="imageUrl">Image URL (Optional)</Label>
-              <Input id="imageUrl" name="imageUrl" type="url" />
+              <Label>Category Image (Optional)</Label>
+              <ImageUpload
+                onImageUpload={setCreateImageUrl}
+                currentImage={createImageUrl}
+                uploadEndpoint="/api/upload/category"
+                label="Upload Category Image"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="sortOrder">Sort Order</Label>
