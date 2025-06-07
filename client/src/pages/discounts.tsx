@@ -112,12 +112,14 @@ export default function Discounts() {
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Discount> }) =>
       apiRequest("PATCH", `/api/discounts/${id}`, data),
-    onSuccess: (data) => {
+    onSuccess: () => {
+      // Force immediate invalidation and refetch
       queryClient.invalidateQueries({ queryKey: ["/api/discounts"] });
-      // Force a refetch to ensure UI updates with latest data
-      queryClient.refetchQueries({ queryKey: ["/api/discounts"] });
+      
+      // Close dialog immediately
       setEditingDiscount(null);
       setEditImageUrl("");
+      
       // Reset edit form
       setEditFormData({
         name: "",
@@ -135,6 +137,7 @@ export default function Discounts() {
         isActive: true,
         usageLimit: ""
       });
+      
       toast({
         title: "Success",
         description: "Discount updated successfully",

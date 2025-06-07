@@ -622,6 +622,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.patch("/api/discounts/:id", requireAuth, requireRole(['admin', 'sales']), async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Convert date strings to Date objects
+      const requestBody = {
+        ...req.body,
+        validFrom: req.body.validFrom ? new Date(req.body.validFrom) : undefined,
+        validTo: req.body.validTo ? new Date(req.body.validTo) : undefined,
+      };
+      
+      const updatedDiscount = await storage.updateDiscount(id, requestBody);
+      
+      if (!updatedDiscount) {
+        return res.status(404).json({ message: "Discount not found" });
+      }
+
+      res.json(updatedDiscount);
+    } catch (error) {
+      console.error("Update discount error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/discounts/:id", requireAuth, requireRole(['admin', 'sales']), async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const success = await storage.deleteDiscount(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Discount not found" });
+      }
+
+      res.json({ success: true, message: "Discount deleted successfully" });
+    } catch (error) {
+      console.error("Delete discount error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Customer Group routes
   app.get("/api/customer-groups", requireAuth, requireRole(['admin', 'sales']), async (req, res) => {
     try {
