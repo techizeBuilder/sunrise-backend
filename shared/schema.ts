@@ -251,8 +251,8 @@ export const productSchema = z.object({
   unit: z.enum(["piece", "kg", "liter", "gram", "pack", "box"]),
   stock: z.number().min(0, "Stock cannot be negative"),
   minStock: z.number().min(0, "Minimum stock cannot be negative"),
-  imageUrl: z.string().url("Invalid image URL"),
-  images: z.array(z.string().url()).default([]),
+  imageUrl: z.string(),
+  images: z.array(z.string()).default([]),
   specifications: z.record(z.string()).default({}),
   tags: z.array(z.string()).default([]),
   isActive: z.boolean().default(true),
@@ -262,7 +262,7 @@ export const categorySchema = z.object({
   name: z.string().min(1, "Category name is required"),
   description: z.string().min(1, "Description is required"),
   parentId: z.string().optional(),
-  imageUrl: z.string().url().optional(),
+  imageUrl: z.string().optional(),
   sortOrder: z.number().default(0),
   isActive: z.boolean().default(true),
 });
@@ -306,6 +306,7 @@ export const discountSchema = z.object({
   validTo: z.date(),
   usageLimit: z.number().min(1).optional(),
   usedCount: z.number().default(0),
+  imageUrl: z.string().optional(),
   isActive: z.boolean().default(true),
 });
 
