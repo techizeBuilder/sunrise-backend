@@ -405,70 +405,70 @@ export default function Home() {
       {/* Product Categories Section */}
       <section className="section-padding bg-muted/30">
         <div className="container-max">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl text-heading mb-4">Our Product Range</h2>
-            <p className="text-lg text-muted-foreground">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl text-heading mb-3 sm:mb-4">Our Product Range</h2>
+            <p className="text-base sm:text-lg text-muted-foreground px-4">
               From traditional favorites to innovative creations, we offer something for every taste
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <div className="group cursor-pointer">
-              <div className="relative overflow-hidden rounded-lg mb-4">
+              <div className="relative overflow-hidden rounded-lg mb-3 sm:mb-4">
                 <img 
                   src="https://images.unsplash.com/photo-1586444248902-2f64eddc13df?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"
                   alt="Breads"
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute bottom-4 left-4 text-white">
-                  <h3 className="text-xl font-semibold">Breads</h3>
-                  <p className="text-sm">Fresh daily varieties</p>
+                <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 text-white">
+                  <h3 className="text-lg sm:text-xl font-semibold">Breads</h3>
+                  <p className="text-xs sm:text-sm">Fresh daily varieties</p>
                 </div>
               </div>
             </div>
             
             <div className="group cursor-pointer">
-              <div className="relative overflow-hidden rounded-lg mb-4">
+              <div className="relative overflow-hidden rounded-lg mb-3 sm:mb-4">
                 <img 
                   src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"
                   alt="Cakes"
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute bottom-4 left-4 text-white">
-                  <h3 className="text-xl font-semibold">Cakes</h3>
-                  <p className="text-sm">Celebration essentials</p>
+                <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 text-white">
+                  <h3 className="text-lg sm:text-xl font-semibold">Cakes</h3>
+                  <p className="text-xs sm:text-sm">Celebration essentials</p>
                 </div>
               </div>
             </div>
             
             <div className="group cursor-pointer">
-              <div className="relative overflow-hidden rounded-lg mb-4">
+              <div className="relative overflow-hidden rounded-lg mb-3 sm:mb-4">
                 <img 
                   src="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"
                   alt="Pastries"
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute bottom-4 left-4 text-white">
-                  <h3 className="text-xl font-semibold">Pastries</h3>
-                  <p className="text-sm">Artisan crafted</p>
+                <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 text-white">
+                  <h3 className="text-lg sm:text-xl font-semibold">Pastries</h3>
+                  <p className="text-xs sm:text-sm">Artisan crafted</p>
                 </div>
               </div>
             </div>
             
             <div className="group cursor-pointer">
-              <div className="relative overflow-hidden rounded-lg mb-4">
+              <div className="relative overflow-hidden rounded-lg mb-3 sm:mb-4">
                 <img 
                   src="https://images.unsplash.com/photo-1509440159596-0249088772ff?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300"
                   alt="Snacks"
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                <div className="absolute bottom-4 left-4 text-white">
-                  <h3 className="text-xl font-semibold">Snacks</h3>
-                  <p className="text-sm">Quick bites</p>
+                <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 text-white">
+                  <h3 className="text-lg sm:text-xl font-semibold">Snacks</h3>
+                  <p className="text-xs sm:text-sm">Quick bites</p>
                 </div>
               </div>
             </div>
@@ -479,15 +479,15 @@ export default function Home() {
       {/* Testimonials Section */}
       <section className="section-padding bg-background">
         <div className="container-max">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl text-heading mb-4">What Our Customers Say</h2>
-            <p className="text-lg text-muted-foreground">
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl text-heading mb-3 sm:mb-4">What Our Customers Say</h2>
+            <p className="text-base sm:text-lg text-muted-foreground px-4">
               Hear from the people who trust us with their daily bread
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-card p-6 rounded-lg shadow-sm border">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            <div className="bg-card p-4 sm:p-6 rounded-lg shadow-sm border">
               <div className="flex items-center mb-4">
                 {[1,2,3,4,5].map((star) => (
                   <svg key={star} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
@@ -495,22 +495,22 @@ export default function Home() {
                   </svg>
                 ))}
               </div>
-              <p className="text-muted-foreground mb-4 italic">
+              <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4 italic">
                 "The quality of bread from Sunrise Foods is exceptional. Our customers always ask for more. 
                 It's been our trusted supplier for over 5 years."
               </p>
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
-                  <span className="text-primary font-semibold">RS</span>
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-full flex items-center justify-center mr-2 sm:mr-3">
+                  <span className="text-primary font-semibold text-sm sm:text-base">RS</span>
                 </div>
                 <div>
-                  <div className="font-semibold">Rajesh Sharma</div>
-                  <div className="text-sm text-muted-foreground">Store Owner, Bangalore</div>
+                  <div className="font-semibold text-sm sm:text-base">Rajesh Sharma</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">Store Owner, Bangalore</div>
                 </div>
               </div>
             </div>
             
-            <div className="bg-card p-6 rounded-lg shadow-sm border">
+            <div className="bg-card p-4 sm:p-6 rounded-lg shadow-sm border">
               <div className="flex items-center mb-4">
                 {[1,2,3,4,5].map((star) => (
                   <svg key={star} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
@@ -518,22 +518,22 @@ export default function Home() {
                   </svg>
                 ))}
               </div>
-              <p className="text-muted-foreground mb-4 italic">
+              <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4 italic">
                 "Their cakes and pastries are simply amazing! Perfect for our hotel's breakfast buffet. 
                 Consistent quality and timely delivery every single day."
               </p>
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
-                  <span className="text-primary font-semibold">MP</span>
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-full flex items-center justify-center mr-2 sm:mr-3">
+                  <span className="text-primary font-semibold text-sm sm:text-base">MP</span>
                 </div>
                 <div>
-                  <div className="font-semibold">Meera Patel</div>
-                  <div className="text-sm text-muted-foreground">Hotel Manager, Hyderabad</div>
+                  <div className="font-semibold text-sm sm:text-base">Meera Patel</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">Hotel Manager, Hyderabad</div>
                 </div>
               </div>
             </div>
             
-            <div className="bg-card p-6 rounded-lg shadow-sm border">
+            <div className="bg-card p-4 sm:p-6 rounded-lg shadow-sm border">
               <div className="flex items-center mb-4">
                 {[1,2,3,4,5].map((star) => (
                   <svg key={star} className="w-5 h-5 text-yellow-400 fill-current" viewBox="0 0 20 20">
@@ -541,17 +541,17 @@ export default function Home() {
                   </svg>
                 ))}
               </div>
-              <p className="text-muted-foreground mb-4 italic">
+              <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4 italic">
                 "As a distributor, I appreciate their professional approach and product variety. 
                 They understand our business needs and always deliver on promises."
               </p>
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mr-3">
-                  <span className="text-primary font-semibold">AK</span>
+                <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary/10 rounded-full flex items-center justify-center mr-2 sm:mr-3">
+                  <span className="text-primary font-semibold text-sm sm:text-base">AK</span>
                 </div>
                 <div>
-                  <div className="font-semibold">Arun Kumar</div>
-                  <div className="text-sm text-muted-foreground">Distributor, Chennai</div>
+                  <div className="font-semibold text-sm sm:text-base">Arun Kumar</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">Distributor, Chennai</div>
                 </div>
               </div>
             </div>
