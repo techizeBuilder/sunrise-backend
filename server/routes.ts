@@ -137,6 +137,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Self profile update route (any authenticated user can update their own profile)
+  app.put("/api/auth/profile", requireAuth, async (req: AuthenticatedRequest, res) => {
+    try {
+      const updates = req.body;
+      const userId = req.user!.userId;
+      
+      // Remove sensitive fields that users shouldn't be able to update
+      const { password, role, isActive, resetToken, resetTokenExpiry, ...allowedUpdates } = updates;
+      
+      const user = await storage.updateUser(userId, allowedUpdates);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Update session data
+      if (req.session.user) {
+        req.session.user.firstName = user.firstName;
+        req.session.user.lastName = user.lastName;
+        req.session.user.email = user.email;
+      }
+
+      const { password: pwd, resetToken: token, resetTokenExpiry: expiry, ...userWithoutSensitive } = user;
+      res.json(userWithoutSensitive);
+    } catch (error) {
+      console.error("Update profile error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Password reset routes
   app.post("/api/auth/forgot-password", async (req, res) => {
     try {

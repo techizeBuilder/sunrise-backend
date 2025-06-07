@@ -27,7 +27,7 @@ export default function Profile() {
   });
 
   const updateProfileMutation = useMutation({
-    mutationFn: (data: any) => apiRequest("PUT", `/api/users/${user?.userId}`, data),
+    mutationFn: (data: any) => apiRequest("PUT", `/api/auth/profile`, data),
     onSuccess: () => {
       toast({
         title: "Profile Updated",
