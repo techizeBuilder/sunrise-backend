@@ -539,6 +539,16 @@ export default function Discounts() {
                 </div>
 
                 <div>
+                  <Label>Discount Image (Optional)</Label>
+                  <ImageUpload
+                    onImageUpload={setCreateImageUrl}
+                    currentImage={createImageUrl}
+                    uploadEndpoint="/api/upload/discount"
+                    label="Upload Discount Image"
+                  />
+                </div>
+
+                <div>
                   <Label htmlFor="isActive">Status</Label>
                   <Select name="isActive" defaultValue="true">
                     <SelectTrigger>
@@ -667,6 +677,16 @@ export default function Discounts() {
                   </div>
 
                   <div>
+                    <Label>Discount Image (Optional)</Label>
+                    <ImageUpload
+                      onImageUpload={setEditImageUrl}
+                      currentImage={editImageUrl || editingDiscount.imageUrl}
+                      uploadEndpoint="/api/upload/discount"
+                      label="Upload Discount Image"
+                    />
+                  </div>
+
+                  <div>
                     <Label htmlFor="edit-isActive">Status</Label>
                     <Select name="isActive" defaultValue={editingDiscount.isActive.toString()}>
                       <SelectTrigger>
@@ -681,7 +701,10 @@ export default function Discounts() {
                 </div>
                 
                 <DialogFooter className="mt-6">
-                  <Button type="button" variant="outline" onClick={() => setEditingDiscount(null)}>
+                  <Button type="button" variant="outline" onClick={() => {
+                    setEditingDiscount(null);
+                    setEditImageUrl("");
+                  }}>
                     Cancel
                   </Button>
                   <Button type="submit" disabled={updateMutation.isPending}>

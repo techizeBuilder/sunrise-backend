@@ -100,6 +100,7 @@ export interface Discount {
   validTo: Date;
   usageLimit?: number;
   usedCount: number;
+  imageUrl?: string;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
