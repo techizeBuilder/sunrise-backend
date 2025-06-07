@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import ManagementLayout from "@/components/layout/management-layout";
 import type { ProductCategory, InsertCategory } from "@shared/schema";
 
 export default function Categories() {
@@ -96,8 +97,9 @@ export default function Categories() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <ManagementLayout>
+      <div className="space-y-6">
+        {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Category Management</h1>
@@ -257,6 +259,7 @@ export default function Categories() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+      </div>
+    </ManagementLayout>
   );
 }
