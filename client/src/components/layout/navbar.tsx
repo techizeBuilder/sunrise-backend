@@ -46,7 +46,7 @@ export default function Navbar() {
                   {item.label}
                 </Link>
               ))}
-              <Link href="/admin">
+              <Link href="/login">
                 <Button className="btn-primary">
                   Admin
                 </Button>
