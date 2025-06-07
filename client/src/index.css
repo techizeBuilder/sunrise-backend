@@ -3,51 +3,51 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(44, 33%, 98%);
-  --foreground: hsl(20, 14.3%, 4.1%);
-  --muted: hsl(44, 15%, 95%);
-  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --background: hsl(50, 40%, 98%);
+  --foreground: hsl(0, 0%, 15%);
+  --muted: hsl(50, 20%, 95%);
+  --muted-foreground: hsl(0, 0%, 45%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --popover-foreground: hsl(0, 0%, 15%);
   --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(20, 14.3%, 4.1%);
-  --border: hsl(20, 5.9%, 90%);
-  --input: hsl(20, 5.9%, 90%);
-  --primary: hsl(22, 85%, 30%);
-  --primary-foreground: hsl(44, 33%, 98%);
-  --secondary: hsl(44, 56%, 70%);
-  --secondary-foreground: hsl(20, 14.3%, 4.1%);
-  --accent: hsl(51, 77%, 44%);
-  --accent-foreground: hsl(20, 14.3%, 4.1%);
+  --card-foreground: hsl(0, 0%, 15%);
+  --border: hsl(50, 15%, 90%);
+  --input: hsl(50, 15%, 90%);
+  --primary: hsl(15, 85%, 55%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(45, 85%, 65%);
+  --secondary-foreground: hsl(0, 0%, 15%);
+  --accent: hsl(25, 90%, 50%);
+  --accent-foreground: hsl(0, 0%, 100%);
   --destructive: hsl(0, 84.2%, 60.2%);
   --destructive-foreground: hsl(60, 9.1%, 97.8%);
-  --ring: hsl(20, 14.3%, 4.1%);
+  --ring: hsl(15, 85%, 55%);
   --radius: 0.5rem;
   
-  /* Custom bakery colors */
-  --cream: hsl(44, 33%, 98%);
-  --dark-brown: hsl(17, 50%, 15%);
-  --warm-brown: hsl(22, 85%, 30%);
-  --light-brown: hsl(44, 56%, 70%);
-  --golden: hsl(51, 77%, 44%);
+  /* Sunrise Foods brand colors */
+  --cream: hsl(50, 40%, 98%);
+  --brand-orange: hsl(15, 85%, 55%);
+  --brand-red: hsl(0, 80%, 60%);
+  --brand-yellow: hsl(45, 85%, 65%);
+  --dark-slate: hsl(210, 20%, 15%);
 }
 
 .dark {
-  --background: hsl(17, 50%, 15%);
-  --foreground: hsl(44, 33%, 98%);
-  --muted: hsl(20, 14%, 20%);
-  --muted-foreground: hsl(44, 15%, 65%);
-  --popover: hsl(17, 50%, 15%);
-  --popover-foreground: hsl(44, 33%, 98%);
-  --card: hsl(17, 50%, 15%);
-  --card-foreground: hsl(44, 33%, 98%);
-  --border: hsl(20, 14%, 25%);
-  --input: hsl(20, 14%, 25%);
-  --primary: hsl(51, 77%, 44%);
-  --primary-foreground: hsl(17, 50%, 15%);
-  --secondary: hsl(20, 14%, 25%);
-  --secondary-foreground: hsl(44, 33%, 98%);
-  --accent: hsl(22, 85%, 30%);
+  --background: hsl(210, 20%, 15%);
+  --foreground: hsl(50, 40%, 98%);
+  --muted: hsl(210, 15%, 20%);
+  --muted-foreground: hsl(50, 15%, 65%);
+  --popover: hsl(210, 20%, 15%);
+  --popover-foreground: hsl(50, 40%, 98%);
+  --card: hsl(210, 20%, 15%);
+  --card-foreground: hsl(50, 40%, 98%);
+  --border: hsl(210, 15%, 25%);
+  --input: hsl(210, 15%, 25%);
+  --primary: hsl(15, 85%, 55%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(210, 15%, 25%);
+  --secondary-foreground: hsl(50, 40%, 98%);
+  --accent: hsl(45, 85%, 65%);
   --accent-foreground: hsl(44, 33%, 98%);
   --destructive: hsl(0, 62.8%, 30.6%);
   --destructive-foreground: hsl(44, 33%, 98%);
@@ -71,15 +71,15 @@
 
 @layer components {
   .bakery-gradient {
-    background: linear-gradient(135deg, var(--warm-brown) 0%, var(--golden) 100%);
+    background: linear-gradient(135deg, var(--brand-orange) 0%, var(--brand-yellow) 100%);
   }
   
   .cream-gradient {
-    background: linear-gradient(135deg, var(--cream) 0%, var(--light-brown) 100%);
+    background: linear-gradient(135deg, var(--cream) 0%, var(--brand-yellow) 100%);
   }
   
   .hero-overlay {
-    background: linear-gradient(rgba(62, 39, 35, 0.5), rgba(62, 39, 35, 0.7));
+    background: linear-gradient(rgba(234, 88, 12, 0.5), rgba(239, 68, 68, 0.7));
   }
   
   .product-card {
