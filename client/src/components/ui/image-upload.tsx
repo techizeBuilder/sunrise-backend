@@ -74,7 +74,16 @@ export function ImageUpload({
           }, 1500);
           return;
         }
-        throw new Error(`Upload failed: ${response.statusText}`);
+        
+        // Try to get error message from response
+        let errorMessage = `Upload failed: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch {
+          // If JSON parsing fails, use the status text
+        }
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();
@@ -87,9 +96,19 @@ export function ImageUpload({
       });
     } catch (error) {
       console.error('Upload error:', error);
+      
+      let errorMessage = "Failed to upload image. Please try again.";
+      if (error instanceof Error) {
+        if (error.message.includes('<!DOCTYPE') || error.message.includes('Unexpected token')) {
+          errorMessage = "Server error occurred. Please ensure you're logged in and try again.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
         title: "Upload Failed",
-        description: "Failed to upload image. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
