@@ -25,8 +25,11 @@ import {
   BarChart3,
   CheckCircle,
   Clock,
-  DollarSign
+  DollarSign,
+  FolderTree,
+  Percent
 } from "lucide-react";
+import { Link } from "wouter";
 
 export default function Dashboard() {
   const { user, isLoading, isAuthenticated } = useAuth();
@@ -277,6 +280,100 @@ function AdminPanel() {
         </Card>
       </div>
       
+      {/* Product Management Section */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
+        <div className="mb-4">
+          <h3 className="text-xl font-bold text-blue-900 mb-2">Product Management Suite</h3>
+          <p className="text-blue-700 text-sm">Comprehensive tools for managing your bakery's product catalog, pricing, and promotions</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+          <Link href="/product-management">
+            <Card className="cursor-pointer hover:shadow-lg transition-all duration-200 border border-blue-300 bg-blue-100 hover:bg-blue-200">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-blue-800">Management Hub</CardTitle>
+                <Package className="h-4 w-4 text-blue-600" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-blue-700">
+                  Central dashboard & overview
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/manage/products">
+            <Card className="cursor-pointer hover:shadow-lg transition-all duration-200 border border-gray-200 bg-white hover:bg-gray-50">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Products</CardTitle>
+                <Package className="h-4 w-4 text-gray-600" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-gray-600">
+                  Manage inventory & SKUs
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/manage/categories">
+            <Card className="cursor-pointer hover:shadow-lg transition-all duration-200 border border-gray-200 bg-white hover:bg-gray-50">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Categories</CardTitle>
+                <FolderTree className="h-4 w-4 text-gray-600" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-gray-600">
+                  Product organization
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/manage/price-lists">
+            <Card className="cursor-pointer hover:shadow-lg transition-all duration-200 border border-gray-200 bg-white hover:bg-gray-50">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Price Lists</CardTitle>
+                <DollarSign className="h-4 w-4 text-gray-600" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-gray-600">
+                  B2B & bulk pricing
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Link href="/manage/discounts">
+            <Card className="cursor-pointer hover:shadow-lg transition-all duration-200 border border-gray-200 bg-white hover:bg-gray-50">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Discounts</CardTitle>
+                <Percent className="h-4 w-4 text-gray-600" />
+              </CardHeader>
+              <CardContent>
+                <p className="text-xs text-gray-600">
+                  Promotional offers & coupons
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Card className="border border-gray-200 bg-white">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-500">More Features</CardTitle>
+              <Plus className="h-4 w-4 text-gray-400" />
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-gray-500">
+                Additional modules coming soon
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
