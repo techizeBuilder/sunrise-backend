@@ -19,7 +19,7 @@ import {
   type InsertDiscount,
   type InsertCustomerGroup,
   type InsertOrder,
-} from "@shared/schema";
+} from "./shared/schema";
 import { connectToDatabase } from "./db";
 import { ObjectId } from "mongodb";
 import bcrypt from "bcryptjs";

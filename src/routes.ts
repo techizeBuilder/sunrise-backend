@@ -15,7 +15,7 @@ import {
   orderSchema,
   type UserSession,
   type UserRole,
-} from "@shared/schema";
+} from "./shared/schema";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
